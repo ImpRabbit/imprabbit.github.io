@@ -1,14 +1,40 @@
+@import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700&display=swap');
+
 html, body {
   margin: 0;
   padding: 0;
   width: 100vw;
   height: 100vh;
   font-size: 40px;
-  font-family: sans-serif;
+  font-family: 'M PLUS Rounded 1c', sans-serif;
   line-height: 1.8;
   box-sizing: border-box;
   overflow-x: hidden;
   transition: background-color 1s ease, color 1s ease;
+}
+
+/* 🌞 朝 */
+body.morning {
+  background-color: #fff8dc; /* コーンスープみたいなやさしい黄色 */
+  color: #333;
+}
+
+/* 🌤 昼 */
+body.noon {
+  background-color: #ffffff;
+  color: #222;
+}
+
+/* 🌇 夕方 */
+body.evening {
+  background-color: #ffcc99;
+  color: #fff;
+}
+
+/* 🌃 夜 */
+body.night {
+  background-color: #1a1a40;
+  color: #fff;
 }
 
 .main-container {
@@ -55,6 +81,7 @@ button {
   border-radius: 14px;
   border: none;
   cursor: pointer;
+  font-family: inherit; /* フォント継承するようにしておくね */
 }
 
 /* 任意時間ボタン */
