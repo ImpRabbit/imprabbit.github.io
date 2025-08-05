@@ -15,7 +15,7 @@ html, body {
 
 /* 🌞 朝 */
 body.morning {
-  background-color: #fff8dc; /* コーンスープみたいなやさしい黄色 */
+  background-color: #fff8dc;
   color: #333;
 }
 
@@ -74,14 +74,14 @@ h1 {
   margin-top: 20px;
 }
 
-/* ボタン見た目 */
+/* ボタン共通スタイル */
 button {
   padding: 24px 36px;
   font-size: 40px;
   border-radius: 14px;
   border: none;
   cursor: pointer;
-  font-family: inherit; /* フォント継承するようにしておくね */
+  font-family: inherit;
 }
 
 /* 任意時間ボタン */
@@ -91,7 +91,21 @@ button {
   font-size: 36px;
 }
 
-/* 色分け */
+/* 任意時間追加フォーム（もしCSSにまとめたい場合） */
+#addTimeForm {
+  margin-top: 10px;
+}
+#addTimeForm input {
+  padding: 8px;
+  font-size: 16px;
+}
+#addTimeForm button {
+  padding: 8px 12px;
+  font-size: 16px;
+  margin-left: 5px;
+}
+
+/* ボタンの色分け */
 .taken {
   background: #4caf50;
   color: #fff;
@@ -102,7 +116,7 @@ button {
   color: #fff;
 }
 
-/* 顔文字スタイル */
+/* 顔文字ふらし */
 .kaomoji {
   position: fixed;
   top: 0;
@@ -114,7 +128,7 @@ button {
   animation: fall-spin 4s linear forwards;
 }
 
-/* 落下＆回転アニメ */
+/* 落下アニメーション */
 @keyframes fall-spin {
   0% {
     transform: translateY(0) rotate(0deg);
@@ -125,7 +139,8 @@ button {
     opacity: 0;
   }
 }
-/* ○×テーブルスタイル（横スクロール対応） */
+
+/* ○×履歴表 */
 #recordTableContainer {
   overflow-x: auto;
   margin-top: 30px;
@@ -147,12 +162,11 @@ button {
   min-width: 60px;
 }
 
-/* ○は青・×は赤 */
+/* ○：青 ／ ×：赤 */
 .record-table .circle {
   color: #2196f3;
   font-weight: bold;
 }
-
 .record-table .cross {
   color: #f44336;
   font-weight: bold;
