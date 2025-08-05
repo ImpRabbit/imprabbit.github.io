@@ -3,7 +3,7 @@ body {
   width: 100vw;
   margin: 0;
   padding: 20px;
-  font-size: 40px;  /* ←ここ！でか文字 */
+  font-size: 40px;
   font-family: sans-serif;
   line-height: 1.8;
   box-sizing: border-box;
@@ -11,7 +11,7 @@ body {
 
 /* タイトル */
 h1 {
-  font-size: 48px;  /* ←最重要タイトルはさらに大きく */
+  font-size: 48px;
   text-align: center;
 }
 
@@ -33,8 +33,8 @@ h1 {
 
 /* ボタン見た目 */
 button {
-  padding: 24px 36px;     /* ←押しやすさ全振り */
-  font-size: 40px;        /* ←ここもでか文字 */
+  padding: 24px 36px;
+  font-size: 40px;
   border-radius: 14px;
   border: none;
   cursor: pointer;
@@ -57,14 +57,18 @@ button {
   margin: 12px auto;
   font-size: 36px;
 }
-/* 顔文字の基本スタイル（オプション）*/
+
+/* 顔文字スタイル（降らせる系） */
 .kaomoji {
   font-size: 32px;
   position: fixed;
   pointer-events: none;
   z-index: 9999;
   user-select: none;
+  animation: fall 4s linear forwards;
 }
+
+/* 降るアニメーション */
 @keyframes fall {
   0% {
     transform: translateY(0);
@@ -74,13 +78,4 @@ button {
     transform: translateY(100vh);
     opacity: 0;
   }
-}
-
-.kaomoji {
-  font-size: 32px;
-  position: fixed;
-  pointer-events: none;
-  z-index: 9999;
-  user-select: none;
-  animation: fall 4s linear forwards;
 }
