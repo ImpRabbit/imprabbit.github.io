@@ -142,9 +142,12 @@ function dropEmojis() {
     emoji.textContent = emojis[Math.floor(Math.random() * emojis.length)];
     emoji.className = "kaomoji";
 
-    // バラけるように位置調整（1〜90vwのランダム整数）
-    const leftPosition = Math.floor(Math.random() * 90) + 1;
-    emoji.style.left = `${leftPosition}vw`;
+    // ランダムなX座標（px指定）
+    const left = Math.floor(Math.random() * window.innerWidth);
+    emoji.style.left = `${left}px`;
+
+    // 明示的にtop指定（保険）
+    emoji.style.top = `0px`;
 
     emoji.style.color = randomColor();
     document.body.appendChild(emoji);
@@ -154,6 +157,5 @@ function dropEmojis() {
     }, 4000);
   }
 }
-
 // 3秒ごとに降らせる
 setInterval(dropEmojis, 3000);
