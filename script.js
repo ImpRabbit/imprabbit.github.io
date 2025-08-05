@@ -1,3 +1,4 @@
+document.addEventListener("DOMContentLoaded", () => {
 // ==================== 🕒 現在時刻の表示 ====================
 const dateDisplay = document.getElementById('dateDisplay');
 const timeDisplay = document.getElementById('timeDisplay');
@@ -200,3 +201,4 @@ function dropEmojis() {
 setInterval(dropEmojis, 600);
 
 render();
+});
