@@ -1,26 +1,20 @@
 /* スマホでもズレにくくする設定 */
 body {
-  margin: 0;
+  max-width: 480px;  /* ←スマホ画面サイズに合わせる */
+  margin: 0 auto;     /* ←中央に寄せる */
   padding: 20px;
-  font-size: 18px;
+  font-size: 20px;    /* ←文字を大きめに */
   font-family: sans-serif;
-  line-height: 1.6;
+  line-height: 1.8;   /* ←行と行の間も広げて読みやすく */
 }
 
-/* ボタンを中央寄せに */
-.buttons, #customTimes, #historyNav {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 10px;
-}
-
-/* ボタン見やすく */
+/* ボタンの見た目調整（中央寄せ＋見やすく） */
 button {
-  padding: 10px 15px;
-  font-size: 16px;
-  border-radius: 6px;
+  display: inline-block;
+  margin: 8px;
+  padding: 14px 20px;
+  font-size: 18px;
+  border-radius: 8px;
   border: none;
   cursor: pointer;
 }
