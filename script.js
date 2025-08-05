@@ -132,7 +132,13 @@ function dropEmojis() {
   emoji.style.left = `${Math.random() * 100}vw`;
   emoji.style.fontSize = `${Math.random() * 20 + 24}px`;
   emoji.style.color = `hsl(${Math.random() * 360}, 80%, 70%)`;
-
+ // クリックでふわっと消える演出
+  emoji.onclick = () => {
+    emoji.style.transition = "all 0.5s ease";
+    emoji.style.transform = "translateY(-200px) scale(0.5)";
+    emoji.style.opacity = "0";
+    setTimeout(() => emoji.remove(), 500);
+  };
   document.body.appendChild(emoji);
 
   // 4秒後に削除
