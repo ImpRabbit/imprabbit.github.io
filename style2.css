@@ -57,3 +57,11 @@ button {
   margin: 12px auto;
   font-size: 36px;
 }
+/* 顔文字の基本スタイル（オプション）*/
+.kaomoji {
+  font-size: 32px;
+  position: fixed;
+  pointer-events: none;
+  z-index: 9999;
+  user-select: none;
+}
