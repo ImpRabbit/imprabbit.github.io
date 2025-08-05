@@ -57,14 +57,14 @@ button {
   cursor: pointer;
 }
 
-/* 任意時間ボタンだけ調整 */
+/* 任意時間ボタン */
 #customTimes button {
   display: block;
   margin: 12px auto;
   font-size: 36px;
 }
 
-/* 色分け（服薬済・未） */
+/* 色分け */
 .taken {
   background: #4caf50;
   color: #fff;
@@ -75,30 +75,26 @@ button {
   color: #fff;
 }
 
-/* 顔文字スタイル（降るやつ） */
+/* 顔文字スタイル */
 .kaomoji {
   position: fixed;
-  top: 0 !important;
+  top: 0;
+  left: 0;
   pointer-events: none;
   z-index: 9999;
   user-select: none;
-  animation: fall 4s linear forwards;
-  will-change: transform, opacity;
+  white-space: nowrap;
+  animation: fall-spin 4s linear forwards;
 }
 
-/* 顔文字アニメーション */
-@keyframes fall {
+/* 落下＆回転アニメ */
+@keyframes fall-spin {
   0% {
-    transform: translateY(0);
+    transform: translateY(0) rotate(0deg);
     opacity: 1;
   }
   100% {
-    transform: translateY(100vh);
+    transform: translateY(100vh) rotate(720deg);
     opacity: 0;
   }
-}
-@keyframes swing {
-  0%   { transform: translateX(0); }
-  50%  { transform: translateX(10px); }
-  100% { transform: translateX(0); }
 }
