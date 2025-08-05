@@ -7,7 +7,6 @@ function updateTimeDisplay() {
   const timeText = now.toLocaleTimeString("ja-JP", { hour12: false });
   timeDisplay.textContent = `現在時刻：${timeText}`;
 }
-
 updateTimeDisplay();
 setInterval(updateTimeDisplay, 1000);
 
@@ -129,8 +128,8 @@ function updateNav() {
   nextDayBtn.disabled = isFuture;
 }
 
-// ==================== 🌈 顔文字アニメーション ====================
-const emojis = ["(𐊭 ∀ 𐊭ˋ)", "(◦`꒳´◦)", "( ˙꒳˙ )", "( 'ω' و(و\"", "Σd(°∀°d)"];
+// ==================== 🌈 カオスランダム顔文字シャワー ====================
+const emojis = ["(𐊭 ∀ 𐊭ˋ)", "(◦`꒳´◦)", "( ˙꒳˙ )", "( 'ω' و(و\"", "Σd(°∀°d)", "(o´ω`o)", "(๑>◡<๑)", "٩( 'ω' )و", "( ˘ω˘ )ｽﾔｧ"];
 
 function randomColor() {
   return `hsl(${Math.floor(Math.random() * 360)}, 70%, 60%)`;
@@ -145,49 +144,47 @@ function dropEmojis() {
       emoji.textContent = emojis[Math.floor(Math.random() * emojis.length)];
       emoji.className = "kaomoji";
 
-      const left = Math.floor(Math.random() * window.innerWidth);
+      const left = Math.random() * window.innerWidth;
+      const fontSize = Math.floor(Math.random() * 24) + 24;
+      const angle = Math.floor(Math.random() * 360);
+      const flip = Math.random() > 0.5 ? -1 : 1;
+      const duration = Math.random() * 3 + 2; // 2〜5秒
+
       emoji.style.left = `${left}px`;
       emoji.style.top = `0px`;
       emoji.style.color = randomColor();
-      emoji.style.fontSize = `${Math.floor(Math.random() * 24) + 24}px`;
-      emoji.style.transform = `rotate(${Math.floor(Math.random() * 360)}deg)`;
+      emoji.style.fontSize = `${fontSize}px`;
+      emoji.style.transform = `rotate(${angle}deg) scaleX(${flip})`;
+      emoji.style.animation = `fall ${duration}s linear forwards, swing ${duration}s ease-in-out infinite`;
 
       document.body.appendChild(emoji);
 
-      setTimeout(() => {
-        emoji.remove();
-      }, 4000);
+      setTimeout(() => emoji.remove(), duration * 1000);
     }, i * 100);
   }
 }
 
-// 常時降るように修正（0.5秒ごと）
 function scheduleDrop() {
   dropEmojis();
   setTimeout(scheduleDrop, 500);
 }
-
 scheduleDrop();
 
-// ==================== 🌇 時間帯で背景・文字色を変える ====================
+// ==================== 🌇 時間帯で背景と文字色を切り替え ====================
 function updateBackgroundTheme() {
   const hour = new Date().getHours();
   const body = document.body;
 
   if (hour >= 5 && hour < 17) {
-    // 朝〜昼（5:00〜16:59）
-    body.style.backgroundColor = "#ffffff";
+    body.style.backgroundColor = "#ffffff"; // 朝〜昼
     body.style.color = "#000000";
   } else if (hour >= 17 && hour < 19) {
-    // 夕方（17:00〜18:59）
-    body.style.backgroundColor = "#ffe0b2";
+    body.style.backgroundColor = "#ffe0b2"; // 夕方
     body.style.color = "#000000";
   } else {
-    // 夜（19:00〜翌4:59）
-    body.style.backgroundColor = "#1a237e";
+    body.style.backgroundColor = "#1a237e"; // 夜
     body.style.color = "#ffffff";
   }
 }
-
 updateBackgroundTheme();
-setInterval(updateBackgroundTheme, 60000); // 毎分更新
+setInterval(updateBackgroundTheme, 60000);
