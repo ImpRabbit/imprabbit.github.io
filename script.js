@@ -57,7 +57,7 @@ function label(key) {
 }
 
 function formatDate(d) {
-  return d.toISOString().split('T')[0]; // YYYY-MM-DD
+  return d.toISOString().split('T')[0];
 }
 
 function dateStrToJapanese(dateStr) {
@@ -157,16 +157,37 @@ function dropEmojis() {
       setTimeout(() => {
         emoji.remove();
       }, 4000);
-    }, i * 150);
+    }, i * 100);
   }
 }
 
+// 常時降るように修正（0.5秒ごと）
 function scheduleDrop() {
-  const delay = Math.random() * 3000 + 1000;
-  setTimeout(() => {
-    dropEmojis();
-    scheduleDrop();
-  }, delay);
+  dropEmojis();
+  setTimeout(scheduleDrop, 500);
 }
 
-scheduleDrop(); // ← 最初の起動
+scheduleDrop();
+
+// ==================== 🌇 時間帯で背景・文字色を変える ====================
+function updateBackgroundTheme() {
+  const hour = new Date().getHours();
+  const body = document.body;
+
+  if (hour >= 5 && hour < 17) {
+    // 朝〜昼（5:00〜16:59）
+    body.style.backgroundColor = "#ffffff";
+    body.style.color = "#000000";
+  } else if (hour >= 17 && hour < 19) {
+    // 夕方（17:00〜18:59）
+    body.style.backgroundColor = "#ffe0b2";
+    body.style.color = "#000000";
+  } else {
+    // 夜（19:00〜翌4:59）
+    body.style.backgroundColor = "#1a237e";
+    body.style.color = "#ffffff";
+  }
+}
+
+updateBackgroundTheme();
+setInterval(updateBackgroundTheme, 60000); // 毎分更新
