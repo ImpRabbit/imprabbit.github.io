@@ -1,5 +1,5 @@
 /* スマホ対応＆視認性アップ */
-body {
+body{
   width: 100vw;
   margin: 0;
   padding: 20px;
@@ -10,13 +10,13 @@ body {
 }
 
 /* タイトル目立たせる */
-h1 {
+h1{
   font-size: 28px;
   text-align: center;
 }
 
 /* 日付 */
-#dateDisplay {
+#dateDisplay{
   font-size: 24px;
   margin-bottom: 20px;
   text-align: center;
@@ -32,7 +32,7 @@ h1 {
 }
 
 /* ボタン見た目 */
-button {
+button{
   padding: 16px 24px;
   font-size: 20px;
   border-radius: 10px;
@@ -41,7 +41,7 @@ button {
 }
 
 /* 服薬済・未服薬 */
-.taken {
+.taken{
   background: #4caf50;
   color: #fff;
 }
