@@ -1,26 +1,28 @@
 /* スマホ対応＆視認性アップ */
 body {
-  max-width: 600px;   /* ←スマホにしてはちょい広め */
-  margin: 0 auto;
-  padding: 30px;
-  font-size: 22px;     /* ←文字をもっと大きく */
+  width: 100vw;
+  margin: 0;
+  padding: 20px;
+  font-size: 22px;
   font-family: sans-serif;
   line-height: 2;
+  box-sizing: border-box;
 }
 
-/* タイトルをさらに目立たせる */
+/* タイトル目立たせる */
 h1 {
   font-size: 28px;
+  text-align: center;
 }
 
-/* 日付表示もっと見やすく */
+/* 日付 */
 #dateDisplay {
   font-size: 24px;
   margin-bottom: 20px;
   text-align: center;
 }
 
-/* ボタン全体大きめ＆中央揃え */
+/* ボタン類のレイアウト */
 .buttons, #customTimes, #historyNav {
   display: flex;
   justify-content: center;
@@ -29,8 +31,8 @@ h1 {
   margin-top: 15px;
 }
 
+/* ボタン見た目 */
 button {
-  display: inline-block;
   padding: 16px 24px;
   font-size: 20px;
   border-radius: 10px;
@@ -38,7 +40,7 @@ button {
   cursor: pointer;
 }
 
-/* ボタン色 */
+/* 服薬済・未服薬 */
 .taken {
   background: #4caf50;
   color: #fff;
