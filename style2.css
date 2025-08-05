@@ -171,3 +171,21 @@ button {
   color: #f44336;
   font-weight: bold;
 }
+@media (max-width: 480px) {
+  html, body {
+    font-size: 28px;
+  }
+
+  button {
+    padding: 16px 24px;
+    font-size: 24px;
+  }
+
+  #dateDisplay, #timeDisplay {
+    font-size: 28px;
+  }
+
+  .record-table {
+    font-size: 20px;
+  }
+}
