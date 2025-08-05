@@ -135,15 +135,18 @@ function randomColor() {
   return `hsl(${Math.floor(Math.random() * 360)}, 70%, 60%)`;
 }
 
-// 顔文字を降らせる関数
+// 顔文字を降らせる関数（バラける改良版）
 function dropEmojis() {
   for (let i = 0; i < 15; i++) {
     const emoji = document.createElement("div");
     emoji.textContent = emojis[Math.floor(Math.random() * emojis.length)];
-    emoji.className = "kaomoji";  // ←★ここ大事！！
-    emoji.style.left = Math.random() * 100 + "vw";
-    emoji.style.color = randomColor();
+    emoji.className = "kaomoji";
 
+    // バラけるように位置調整（1〜90vwのランダム整数）
+    const leftPosition = Math.floor(Math.random() * 90) + 1;
+    emoji.style.left = `${leftPosition}vw`;
+
+    emoji.style.color = randomColor();
     document.body.appendChild(emoji);
 
     setTimeout(() => {
