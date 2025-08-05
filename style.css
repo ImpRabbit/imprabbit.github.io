@@ -1,39 +1,55 @@
-/* スマホでもズレにくくする設定 */
+/* スマホ対応＆視認性アップ */
 body {
-  max-width: 480px;  /* ←スマホ画面サイズに合わせる */
-  margin: 0 auto;     /* ←中央に寄せる */
-  padding: 20px;
-  font-size: 20px;    /* ←文字を大きめに */
+  max-width: 600px;   /* ←スマホにしてはちょい広め */
+  margin: 0 auto;
+  padding: 30px;
+  font-size: 22px;     /* ←文字をもっと大きく */
   font-family: sans-serif;
-  line-height: 1.8;   /* ←行と行の間も広げて読みやすく */
+  line-height: 2;
 }
 
-/* ボタンの見た目調整（中央寄せ＋見やすく） */
+/* タイトルをさらに目立たせる */
+h1 {
+  font-size: 28px;
+}
+
+/* 日付表示もっと見やすく */
+#dateDisplay {
+  font-size: 24px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+/* ボタン全体大きめ＆中央揃え */
+.buttons, #customTimes, #historyNav {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-top: 15px;
+}
+
 button {
   display: inline-block;
-  margin: 8px;
-  padding: 14px 20px;
-  font-size: 18px;
-  border-radius: 8px;
+  padding: 16px 24px;
+  font-size: 20px;
+  border-radius: 10px;
   border: none;
   cursor: pointer;
 }
+
+/* ボタン色 */
 .taken {
-    background: #4caf50;
-    color: #fff;
+  background: #4caf50;
+  color: #fff;
 }
 
 .not-taken {
-    background: #f44336;
-    color: #fff;
+  background: #f44336;
+  color: #fff;
 }
 
 #customTimes button {
-    display: block;
-    margin: 5px auto;
-}
-
-#dateDisplay {
-    font-size: 1.4rem;
-    margin-bottom: 15px;
+  display: block;
+  margin: 8px auto;
 }
