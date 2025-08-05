@@ -137,24 +137,28 @@ function randomColor() {
 
 // 顔文字を降らせる関数（バラける改良版）
 function dropEmojis() {
-  for (let i = 0; i < 15; i++) {
-    const emoji = document.createElement("div");
-    emoji.textContent = emojis[Math.floor(Math.random() * emojis.length)];
-    emoji.className = "kaomoji";
+  const count = Math.floor(Math.random() * 10) + 5; // 5〜14個
 
-    // ランダムなX座標（px指定）
-    const left = Math.floor(Math.random() * window.innerWidth);
-    emoji.style.left = `${left}px`;
-
-    // 明示的にtop指定（保険）
-    emoji.style.top = `0px`;
-
-    emoji.style.color = randomColor();
-    document.body.appendChild(emoji);
-
+  for (let i = 0; i < count; i++) {
     setTimeout(() => {
-      emoji.remove();
-    }, 4000);
+      const emoji = document.createElement("div");
+      emoji.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+      emoji.className = "kaomoji";
+
+      // ランダム位置・サイズ・角度・色
+      const left = Math.floor(Math.random() * window.innerWidth);
+      emoji.style.left = `${left}px`;
+      emoji.style.top = `0px`;
+      emoji.style.color = randomColor();
+      emoji.style.fontSize = `${Math.floor(Math.random() * 24) + 24}px`;  // ← ★ サイズ
+      emoji.style.transform = `rotate(${Math.floor(Math.random() * 360)}deg)`; // ← ★ 角度
+
+      document.body.appendChild(emoji);
+
+      setTimeout(() => {
+        emoji.remove();
+      }, 4000);
+    }, i * 200); // バラバラに出現
   }
 }
 // 3秒ごとに降らせる
