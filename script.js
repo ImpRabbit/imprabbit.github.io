@@ -140,15 +140,9 @@ function dropEmojis() {
   for (let i = 0; i < 15; i++) {
     const emoji = document.createElement("div");
     emoji.textContent = emojis[Math.floor(Math.random() * emojis.length)];
-    emoji.style.position = "fixed";
-    emoji.style.top = "-50px";
+    emoji.className = "kaomoji";  // ←★ここ大事！！
     emoji.style.left = Math.random() * 100 + "vw";
-    emoji.style.fontSize = "32px";
     emoji.style.color = randomColor();
-    emoji.style.zIndex = 9999;
-    emoji.style.transition = "transform 4s linear, opacity 4s ease";
-    emoji.style.transform = `translateY(100vh)`;
-    emoji.style.opacity = "0";
 
     document.body.appendChild(emoji);
 
