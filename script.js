@@ -4,8 +4,7 @@ const timeDisplay = document.getElementById('timeDisplay');
 
 function updateTimeDisplay() {
   const now = new Date();
-  const timeText = now.toLocaleTimeString("ja-JP", { hour12: false });
-  timeDisplay.textContent = `現在時刻：${timeText}`;
+  timeDisplay.textContent = `現在時刻：${now.toLocaleTimeString("ja-JP", { hour12: false })}`;
 }
 updateTimeDisplay();
 setInterval(updateTimeDisplay, 1000);
@@ -27,18 +26,27 @@ function updateThemeByTime() {
   }
 }
 updateThemeByTime();
-setInterval(updateThemeByTime, 60 * 60 * 1000); // 1時間ごとに再判定
+setInterval(updateThemeByTime, 60 * 60 * 1000);
 
-// ==================== 📅 日付フォーマット ====================
+// ==================== 📅 日付と曜日の取得 ====================
 function formatDate(date) {
   const y = date.getFullYear();
   const m = String(date.getMonth() + 1).padStart(2, "0");
   const d = String(date.getDate()).padStart(2, "0");
   return `${y}-${m}-${d}`;
 }
-function dateStrToJapanese(dateStr) {
-  const [y, m, d] = dateStr.split("-");
-  return `${y}年${m}月${d}日`;
+function getWeekday(date) {
+  return "日月火水木金土"[date.getDay()];
+}
+function getPastDates(numDays = 7) {
+  const dates = [];
+  const today = new Date();
+  for (let i = 0; i < numDays; i++) {
+    const d = new Date();
+    d.setDate(today.getDate() - i);
+    dates.push(d);
+  }
+  return dates.reverse();
 }
 
 // ==================== 📦 保存・読み込み ====================
@@ -50,23 +58,48 @@ function loadDay(dateStr) {
   return json ? JSON.parse(json) : {};
 }
 
-// ==================== 📋 表示レンダリング ====================
+// ==================== 🔘 任意時間フォーム制御 ====================
+const addTimeBtn = document.getElementById('addTimeButton');
+const addTimeForm = document.getElementById('addTimeForm');
+const confirmAddTime = document.getElementById('confirmAddTime');
+const newTimeLabelInput = document.getElementById('newTimeLabel');
+
+addTimeBtn.addEventListener('click', () => {
+  addTimeForm.style.display = 'block';
+  newTimeLabelInput.focus();
+});
+confirmAddTime.addEventListener('click', () => {
+  const label = newTimeLabelInput.value.trim();
+  if (!label) return;
+  const dateStr = formatDate(currentDate);
+  const data = loadDay(dateStr);
+  data.custom = data.custom || [];
+  if (!data.custom.find(item => item.label === label)) {
+    data.custom.push({ label, taken: false });
+  }
+  saveDay(dateStr, data);
+  newTimeLabelInput.value = '';
+  addTimeForm.style.display = 'none';
+  render();
+});
+
+// ==================== 📋 服薬ボタン表示 ====================
 const buttonsDiv = document.querySelector('.buttons');
 const customTimesDiv = document.getElementById('customTimes');
-const addTimeBtn = document.getElementById('addTimeButton');
 const prevDayBtn = document.getElementById('prevDay');
 const todayBtn = document.getElementById('today');
 const nextDayBtn = document.getElementById('nextDay');
-
 let currentDate = new Date();
-render();
+
+prevDayBtn.onclick = () => { currentDate.setDate(currentDate.getDate() - 1); render(); };
+todayBtn.onclick = () => { currentDate = new Date(); render(); };
+nextDayBtn.onclick = () => { currentDate.setDate(currentDate.getDate() + 1); render(); };
 
 function render() {
   const dateStr = formatDate(currentDate);
   const data = loadDay(dateStr);
-  dateDisplay.textContent = dateStrToJapanese(dateStr);
+  dateDisplay.textContent = `${formatDate(currentDate)}（${getWeekday(currentDate)}）`;
 
-  // 3固定時間（朝・昼・晩）
   buttonsDiv.innerHTML = "";
   ["朝", "昼", "晩"].forEach(time => {
     const btn = document.createElement("button");
@@ -80,59 +113,80 @@ function render() {
     buttonsDiv.appendChild(btn);
   });
 
-  // 任意時間
   customTimesDiv.innerHTML = "";
-  (data.custom || []).forEach((item, i) => {
+  (data.custom || []).forEach(entry => {
     const btn = document.createElement("button");
-    btn.textContent = item.label;
-    btn.className = item.taken ? "taken" : "not-taken";
+    btn.textContent = entry.label;
+    btn.className = entry.taken ? "taken" : "not-taken";
     btn.onclick = () => {
-      item.taken = !item.taken;
+      entry.taken = !entry.taken;
       saveDay(dateStr, data);
       render();
     };
     customTimesDiv.appendChild(btn);
   });
+
+  generateRotatedRecordTable();
 }
 
-// ==================== ➕ 任意の時間追加 ====================
-addTimeBtn.onclick = () => {
-  const label = prompt("時間帯のラベルを入力してね（例：夜中、寝る前など）");
-  if (!label) return;
-  const dateStr = formatDate(currentDate);
-  const data = loadDay(dateStr);
-  if (!data.custom) data.custom = [];
-  data.custom.push({ label, taken: true });
-  saveDay(dateStr, data);
-  render();
-};
+// ==================== 📊 横型記録表（曜日） ====================
+function generateRotatedRecordTable() {
+  const container = document.getElementById("recordTableContainer");
+  container.innerHTML = "";
+  const dates = getPastDates(7);
+  const dateStrs = dates.map(formatDate);
+  const weekdays = dates.map(getWeekday);
 
-// ==================== 📆 日移動 ====================
-prevDayBtn.onclick = () => {
-  currentDate.setDate(currentDate.getDate() - 1);
-  render();
-};
-todayBtn.onclick = () => {
-  currentDate = new Date();
-  render();
-};
-nextDayBtn.onclick = () => {
-  currentDate.setDate(currentDate.getDate() + 1);
-  render();
-};
+  const allTimeLabels = ["朝", "昼", "晩"];
+  const customLabelsSet = new Set();
+  dateStrs.forEach(dateStr => {
+    const data = loadDay(dateStr);
+    (data.custom || []).forEach(item => customLabelsSet.add(item.label));
+  });
+  allTimeLabels.push(...customLabelsSet);
 
-// ==================== ✨ 顔文字ふらし ====================
-const emojis = ["(𐊭 ∀ 𐊭ˋ)", "(◦`꒳´◦)", "( ˙꒳˙ )", "( 'ω' و(و\"", "Σd(°∀°d)"];
+  const table = document.createElement("table");
+  const thead = document.createElement("thead");
+  const headRow = document.createElement("tr");
+  headRow.innerHTML = "<th>時間＼曜日</th>" + weekdays.map(day => `<th>${day}</th>`).join("");
+  thead.appendChild(headRow);
+  table.appendChild(thead);
+
+  const tbody = document.createElement("tbody");
+  allTimeLabels.forEach(label => {
+    const row = document.createElement("tr");
+    const th = document.createElement("th");
+    th.textContent = label;
+    row.appendChild(th);
+    dateStrs.forEach(dateStr => {
+      const td = document.createElement("td");
+      const data = loadDay(dateStr);
+      if (["朝", "昼", "晩"].includes(label)) {
+        const taken = data[label];
+        td.textContent = taken === true ? "○" : taken === false ? "×" : "";
+        td.className = taken === true ? "circle" : taken === false ? "cross" : "";
+      } else {
+        const match = (data.custom || []).find(item => item.label === label);
+        td.textContent = match ? (match.taken ? "○" : "×") : "";
+        td.className = match ? (match.taken ? "circle" : "cross") : "";
+      }
+      row.appendChild(td);
+    });
+    tbody.appendChild(row);
+  });
+  table.appendChild(tbody);
+  container.appendChild(table);
+}
+
+// ==================== 💖 顔文字ふらし ====================
+const emojis = ["(𐊭 ∀ 𐊭ˋ)", "(◦`꒳´◦)", "( ˙꒳˙ )", "( 'ω' و(و"", "Σd(°∀°d)"];
 function dropEmojis() {
   const emoji = document.createElement("div");
   emoji.className = "kaomoji";
   emoji.textContent = emojis[Math.floor(Math.random() * emojis.length)];
-
-  // ランダムな位置・サイズ・色
   emoji.style.left = `${Math.random() * 100}vw`;
   emoji.style.fontSize = `${Math.random() * 20 + 24}px`;
   emoji.style.color = `hsl(${Math.random() * 360}, 80%, 70%)`;
- // クリックでふわっと消える演出
   emoji.onclick = () => {
     emoji.style.transition = "all 0.5s ease";
     emoji.style.transform = "translateY(-200px) scale(0.5)";
@@ -140,113 +194,8 @@ function dropEmojis() {
     setTimeout(() => emoji.remove(), 500);
   };
   document.body.appendChild(emoji);
-
-  // 4秒後に削除
-  setTimeout(() => {
-    emoji.remove();
-  }, 4000);
+  setTimeout(() => emoji.remove(), 4000);
 }
 setInterval(dropEmojis, 600);
-// ==================== 📅 横向き○×履歴表生成 ====================
 
-function getPastDates(numDays = 7) {
-  const dates = [];
-  const today = new Date();
-  for (let i = 0; i < numDays; i++) {
-    const d = new Date();
-    d.setDate(today.getDate() - i);
-    dates.push(d);
-  }
-  return dates.reverse();
-}
-
-function generateRotatedRecordTable() {
-  const tableContainer = document.getElementById("recordTableContainer");
-  const dates = getPastDates(7);
-  const dateStrs = dates.map(formatDate);
-  const dayLabels = dates.map(d => `${d.getDate()}日`);
-
-  // ★ 固定時間帯（朝・昼・晩）
-  const timeLabels = ["朝", "昼", "晩"];
-  const customLabelsSet = new Set();
-
-  // ★ 任意ラベル集める（7日間分）
-  dateStrs.forEach(dateStr => {
-    const data = loadDay(dateStr);
-    if (data.custom) {
-      data.custom.forEach(entry => {
-        customLabelsSet.add(entry.label);
-      });
-    }
-  });
-
-  const allTimeLabels = [...timeLabels, ...customLabelsSet];
-
-  // 表作成
-  const table = document.createElement("table");
-  table.className = "record-table";
-
-  // ヘッダー：1行目（1列目は空、2列目以降に「日」だけ表示）
-  const thead = document.createElement("thead");
-  const headRow = document.createElement("tr");
-  const blankTh = document.createElement("th");
-  blankTh.textContent = "時間＼日付";
-  headRow.appendChild(blankTh);
-
-  dayLabels.forEach(label => {
-    const th = document.createElement("th");
-    th.textContent = label;
-    headRow.appendChild(th);
-  });
-
-  thead.appendChild(headRow);
-  table.appendChild(thead);
-
-  // 本文
-  const tbody = document.createElement("tbody");
-
-  allTimeLabels.forEach(label => {
-    const tr = document.createElement("tr");
-    const labelTd = document.createElement("td");
-    labelTd.textContent = label;
-    tr.appendChild(labelTd);
-
-    dateStrs.forEach(dateStr => {
-      const td = document.createElement("td");
-      const data = loadDay(dateStr);
-
-      if (["朝", "昼", "晩"].includes(label)) {
-        const taken = data[label];
-        if (taken === true) {
-          td.textContent = "○";
-          td.className = "circle";
-        } else if (taken === false) {
-          td.textContent = "×";
-          td.className = "cross";
-        } else {
-          td.textContent = "";
-        }
-      } else {
-        // 任意ラベル
-        const matched = (data.custom || []).find(item => item.label === label);
-        if (matched) {
-          td.textContent = matched.taken ? "○" : "×";
-          td.className = matched.taken ? "circle" : "cross";
-        } else {
-          td.textContent = "";
-        }
-      }
-
-      tr.appendChild(td);
-    });
-
-    tbody.appendChild(tr);
-  });
-
-  table.appendChild(tbody);
-  tableContainer.innerHTML = "";
-  tableContainer.appendChild(table);
-}
-
-// 📦 ページ読み込み時に実行
-generateRotatedRecordTable();
+render();
