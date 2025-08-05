@@ -10,6 +10,25 @@ function updateTimeDisplay() {
 updateTimeDisplay();
 setInterval(updateTimeDisplay, 1000);
 
+// ==================== 🌇 時間帯に応じたテーマ変更 ====================
+function updateThemeByTime() {
+  const hour = new Date().getHours();
+  const body = document.body;
+  body.classList.remove('morning', 'noon', 'evening', 'night');
+
+  if (hour >= 6 && hour < 12) {
+    body.classList.add('morning');
+  } else if (hour >= 12 && hour < 18) {
+    body.classList.add('noon');
+  } else if (hour >= 18 && hour < 22) {
+    body.classList.add('evening');
+  } else {
+    body.classList.add('night');
+  }
+}
+updateThemeByTime();
+setInterval(updateThemeByTime, 60 * 60 * 1000); // 1時間ごとに再判定
+
 // ==================== 📅 日付フォーマット ====================
 function formatDate(date) {
   const y = date.getFullYear();
