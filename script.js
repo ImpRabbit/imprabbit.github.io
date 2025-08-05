@@ -10,7 +10,28 @@ function updateTimeDisplay() {
 updateTimeDisplay();
 setInterval(updateTimeDisplay, 1000);
 
-// ==================== 📅 日付と記録表示 ====================
+// ==================== 📅 日付フォーマット ====================
+function formatDate(date) {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+function dateStrToJapanese(dateStr) {
+  const [y, m, d] = dateStr.split("-");
+  return `${y}年${m}月${d}日`;
+}
+
+// ==================== 📦 保存・読み込み ====================
+function saveDay(dateStr, data) {
+  localStorage.setItem(`meds-${dateStr}`, JSON.stringify(data));
+}
+function loadDay(dateStr) {
+  const json = localStorage.getItem(`meds-${dateStr}`);
+  return json ? JSON.parse(json) : {};
+}
+
+// ==================== 📋 表示レンダリング ====================
 const buttonsDiv = document.querySelector('.buttons');
 const customTimesDiv = document.getElementById('customTimes');
 const addTimeBtn = document.getElementById('addTimeButton');
@@ -23,168 +44,81 @@ render();
 
 function render() {
   const dateStr = formatDate(currentDate);
+  const data = loadDay(dateStr);
   dateDisplay.textContent = dateStrToJapanese(dateStr);
-  const dayData = loadDay(dateStr);
 
-  const defaultTimes = ['morning', 'noon', 'evening'];
-  buttonsDiv.innerHTML = '';
-  defaultTimes.forEach(t => {
-    const btn = document.createElement('button');
-    btn.dataset.time = t;
-    btn.textContent = label(t);
-    btn.className = dayData[t] ? 'taken' : 'not-taken';
-    btn.onclick = () => toggleTime(t);
+  // 3固定時間（朝・昼・晩）
+  buttonsDiv.innerHTML = "";
+  ["朝", "昼", "晩"].forEach(time => {
+    const btn = document.createElement("button");
+    btn.textContent = time;
+    btn.className = data[time] ? "taken" : "not-taken";
+    btn.onclick = () => {
+      data[time] = !data[time];
+      saveDay(dateStr, data);
+      render();
+    };
     buttonsDiv.appendChild(btn);
   });
 
-  customTimesDiv.innerHTML = '';
-  (dayData.custom || []).forEach(timeObj => {
-    const btn = document.createElement('button');
-    btn.dataset.time = timeObj.name;
-    btn.textContent = timeObj.name;
-    btn.className = timeObj.taken ? 'taken' : 'not-taken';
-    btn.onclick = () => toggleCustom(timeObj.name);
+  // 任意時間
+  customTimesDiv.innerHTML = "";
+  (data.custom || []).forEach((item, i) => {
+    const btn = document.createElement("button");
+    btn.textContent = item.label;
+    btn.className = item.taken ? "taken" : "not-taken";
+    btn.onclick = () => {
+      item.taken = !item.taken;
+      saveDay(dateStr, data);
+      render();
+    };
     customTimesDiv.appendChild(btn);
   });
-
-  updateNav();
 }
 
-function label(key) {
-  const map = { morning: '朝', noon: '昼', evening: '晩' };
-  return map[key] || key;
-}
-
-function formatDate(d) {
-  return d.toISOString().split('T')[0];
-}
-
-function dateStrToJapanese(dateStr) {
-  const [y, m, d] = dateStr.split('-').map(Number);
-  return `${y}年${m}月${d}日`;
-}
-
-function loadDay(dateStr) {
-  const records = JSON.parse(localStorage.getItem('medRecords') || '{}');
-  return records[dateStr] || { custom: [] };
-}
-
-function saveDay(dateStr, data) {
-  const records = JSON.parse(localStorage.getItem('medRecords') || '{}');
-  records[dateStr] = data;
-  localStorage.setItem('medRecords', JSON.stringify(records));
-}
-
-function toggleTime(key) {
-  const dateStr = formatDate(currentDate);
-  const data = loadDay(dateStr);
-  data[key] = !data[key];
-  saveDay(dateStr, data);
-  render();
-}
-
-function toggleCustom(name) {
-  const dateStr = formatDate(currentDate);
-  const data = loadDay(dateStr);
-  const idx = data.custom.findIndex(x => x.name === name);
-  if (idx >= 0) {
-    data.custom[idx].taken = !data.custom[idx].taken;
-    saveDay(dateStr, data);
-    render();
-  }
-}
-
+// ==================== ➕ 任意の時間追加 ====================
 addTimeBtn.onclick = () => {
-  const name = prompt('追加する時間帯の名前を入力');
-  if (!name) return;
+  const label = prompt("時間帯のラベルを入力してね（例：夜中、寝る前など）");
+  if (!label) return;
   const dateStr = formatDate(currentDate);
   const data = loadDay(dateStr);
-  if (data.custom.some(x => x.name === name)) {
-    alert('同じ名前が既にあります');
-    return;
-  }
-  data.custom.push({ name, taken: true });
+  if (!data.custom) data.custom = [];
+  data.custom.push({ label, taken: true });
   saveDay(dateStr, data);
   render();
 };
 
+// ==================== 📆 日移動 ====================
 prevDayBtn.onclick = () => {
   currentDate.setDate(currentDate.getDate() - 1);
-  render();
-};
-nextDayBtn.onclick = () => {
-  currentDate.setDate(currentDate.getDate() + 1);
   render();
 };
 todayBtn.onclick = () => {
   currentDate = new Date();
   render();
 };
+nextDayBtn.onclick = () => {
+  currentDate.setDate(currentDate.getDate() + 1);
+  render();
+};
 
-function updateNav() {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const isFuture = currentDate > today;
-  nextDayBtn.disabled = isFuture;
-}
-
-// ==================== 🌈 カオスランダム顔文字シャワー ====================
-const emojis = ["(𐊭 ∀ 𐊭ˋ)", "(◦`꒳´◦)", "( ˙꒳˙ )", "( 'ω' و(و\"", "Σd(°∀°d)", "(o´ω`o)", "(๑>◡<๑)", "٩( 'ω' )و", "( ˘ω˘ )ｽﾔｧ"];
-
-function randomColor() {
-  return `hsl(${Math.floor(Math.random() * 360)}, 70%, 60%)`;
-}
-
+// ==================== ✨ 顔文字ふらし ====================
+const emojis = ["(𐊭 ∀ 𐊭ˋ)", "(◦`꒳´◦)", "( ˙꒳˙ )", "( 'ω' و(و\"", "Σd(°∀°d)"];
 function dropEmojis() {
-  const count = Math.floor(Math.random() * 10) + 2;
+  const emoji = document.createElement("div");
+  emoji.className = "kaomoji";
+  emoji.textContent = emojis[Math.floor(Math.random() * emojis.length)];
 
-  for (let i = 0; i < count; i++) {
-    setTimeout(() => {
-      const emoji = document.createElement("div");
-      emoji.textContent = emojis[Math.floor(Math.random() * emojis.length)];
-      emoji.className = "kaomoji";
+  // ランダムな位置・サイズ・色
+  emoji.style.left = `${Math.random() * 100}vw`;
+  emoji.style.fontSize = `${Math.random() * 20 + 24}px`;
+  emoji.style.color = `hsl(${Math.random() * 360}, 80%, 70%)`;
 
-      const left = Math.random() * window.innerWidth;
-      const fontSize = Math.floor(Math.random() * 24) + 24;
-      const angle = Math.floor(Math.random() * 360);
-      const flip = Math.random() > 0.5 ? -1 : 1;
-      const duration = Math.random() * 3 + 2; // 2〜5秒
+  document.body.appendChild(emoji);
 
-      emoji.style.left = `${left}px`;
-      emoji.style.top = `0px`;
-      emoji.style.color = randomColor();
-      emoji.style.fontSize = `${fontSize}px`;
-      emoji.style.transform = `rotate(${angle}deg) scaleX(${flip})`;
-      emoji.style.animation = `fall ${duration}s linear forwards, swing ${duration}s ease-in-out infinite`;
-
-      document.body.appendChild(emoji);
-
-      setTimeout(() => emoji.remove(), duration * 1000);
-    }, i * 100);
-  }
+  // 4秒後に削除
+  setTimeout(() => {
+    emoji.remove();
+  }, 4000);
 }
-
-function scheduleDrop() {
-  dropEmojis();
-  setTimeout(scheduleDrop, 500);
-}
-scheduleDrop();
-
-// ==================== 🌇 時間帯で背景と文字色を切り替え ====================
-function updateBackgroundTheme() {
-  const hour = new Date().getHours();
-  const body = document.body;
-
-  if (hour >= 5 && hour < 17) {
-    body.style.backgroundColor = "#ffffff"; // 朝〜昼
-    body.style.color = "#000000";
-  } else if (hour >= 17 && hour < 19) {
-    body.style.backgroundColor = "#ffe0b2"; // 夕方
-    body.style.color = "#000000";
-  } else {
-    body.style.backgroundColor = "#1a237e"; // 夜
-    body.style.color = "#ffffff";
-  }
-}
-updateBackgroundTheme();
-setInterval(updateBackgroundTheme, 60000);
+setInterval(dropEmojis, 600);
