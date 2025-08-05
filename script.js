@@ -146,6 +146,7 @@ function generateRotatedRecordTable() {
   allTimeLabels.push(...customLabelsSet);
 
   const table = document.createElement("table");
+table.className = "record-table"; //
   const thead = document.createElement("thead");
   const headRow = document.createElement("tr");
   headRow.innerHTML = "<th>時間＼曜日</th>" + weekdays.map(day => `<th>${day}</th>`).join("");
