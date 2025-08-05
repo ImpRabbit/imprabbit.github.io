@@ -1,47 +1,47 @@
-/* スマホ対応＆視認性アップ */
-body{
+/* 📱 スマホ向け特大文字・視認性最優先 */
+body {
   width: 100vw;
   margin: 0;
   padding: 20px;
-  font-size: 22px;
+  font-size: 40px;  /* ←ここ！でか文字 */
   font-family: sans-serif;
-  line-height: 2;
+  line-height: 1.8;
   box-sizing: border-box;
 }
 
-/* タイトル目立たせる */
-h1{
-  font-size: 28px;
+/* タイトル */
+h1 {
+  font-size: 48px;  /* ←最重要タイトルはさらに大きく */
   text-align: center;
 }
 
-/* 日付 */
-#dateDisplay{
-  font-size: 24px;
-  margin-bottom: 20px;
+/* 日付表示 */
+#dateDisplay {
+  font-size: 44px;
+  margin-bottom: 30px;
   text-align: center;
 }
 
-/* ボタン類のレイアウト */
+/* ボタン配置 */
 .buttons, #customTimes, #historyNav {
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
-  gap: 15px;
-  margin-top: 15px;
+  gap: 25px;
+  margin-top: 25px;
 }
 
 /* ボタン見た目 */
-button{
-  padding: 16px 24px;
-  font-size: 20px;
-  border-radius: 10px;
+button {
+  padding: 24px 36px;     /* ←押しやすさ全振り */
+  font-size: 40px;        /* ←ここもでか文字 */
+  border-radius: 14px;
   border: none;
   cursor: pointer;
 }
 
-/* 服薬済・未服薬 */
-.taken{
+/* 服薬チェック色分け */
+.taken {
   background: #4caf50;
   color: #fff;
 }
@@ -51,7 +51,9 @@ button{
   color: #fff;
 }
 
+/* 任意時間ボタンだけ縦中央寄せ */
 #customTimes button {
   display: block;
-  margin: 8px auto;
+  margin: 12px auto;
+  font-size: 36px;
 }
