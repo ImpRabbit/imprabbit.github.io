@@ -1,5 +1,16 @@
 // Medication Tracker
 const dateDisplay = document.getElementById('dateDisplay');
+function updateTimeDisplay() {
+  const timeElement = document.getElementById("timeDisplay");
+  const now = new Date();
+  const timeText = now.toLocaleTimeString("ja-JP", { hour12: false });
+  timeElement.textContent = `現在時刻：${timeText}`;
+}
+
+// 最初に1回表示
+updateTimeDisplay();
+// 毎秒更新
+setInterval(updateTimeDisplay, 1000);
 const buttonsDiv = document.querySelector('.buttons');
 const customTimesDiv = document.getElementById('customTimes');
 const addTimeBtn = document.getElementById('addTimeButton');
