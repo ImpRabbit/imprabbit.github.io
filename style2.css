@@ -80,3 +80,15 @@ button {
     opacity: 0;
   }
 }
+
+.kaomoji {
+  font-size: 32px;
+  position: fixed;
+  top: 0 !important;
+  /* left は JSで上書きされるのでここは削除 */
+  pointer-events: none;
+  z-index: 9999;
+  user-select: none;
+  animation: fall 4s linear forwards;
+  will-change: transform, opacity; /* ←これも加えると滑らかに */
+}
