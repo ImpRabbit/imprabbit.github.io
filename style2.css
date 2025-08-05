@@ -8,6 +8,7 @@ html, body {
   line-height: 1.8;
   box-sizing: border-box;
   overflow-x: hidden;
+  transition: background-color 1s ease, color 1s ease;
 }
 
 .main-container {
