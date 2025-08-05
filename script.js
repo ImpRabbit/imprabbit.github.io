@@ -179,7 +179,7 @@ function generateRotatedRecordTable() {
 }
 
 // ==================== 💖 顔文字ふらし ====================
-const emojis = ["(𐊭 ∀ 𐊭ˋ)", "(◦`꒳´◦)", "( ˙꒳˙ )", "( 'ω' و(و"", "Σd(°∀°d)"];
+const emojis = ["(𐊭 ∀ 𐊭ˋ)", "(◦`꒳´◦)", "( ˙꒳˙ )", "( 'ω' و(و"", "Σd(°∀°d)","(っ'-')╮ =͟͟͞͞💊"];
 function dropEmojis() {
   const emoji = document.createElement("div");
   emoji.className = "kaomoji";
