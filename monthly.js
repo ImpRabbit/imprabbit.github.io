@@ -155,6 +155,9 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function startEmojiRain(emojiList) {
+    // 絵文字が残らないように全部削除
+    document.querySelectorAll(".falling-emoji").forEach(e => e.remove());
+
     if (window.__emojiRainInterval) clearInterval(window.__emojiRainInterval);
 
     function dropEmoji() {
@@ -167,9 +170,14 @@ document.addEventListener("DOMContentLoaded", () => {
       emoji.style.fontSize = `${18 + Math.random() * 20}px`;
       emoji.style.opacity = (0.3 + Math.random() * 0.3).toFixed(2);
       emoji.style.animationDuration = `${3 + Math.random() * 4}s`;
-　　　　emoji.style.animationName = "fall-spin";
-      
+      emoji.style.animationName = "fall-spin";
+
       document.body.appendChild(emoji);
+
+      // ✅ アニメ終了後に確実に削除！
+      emoji.addEventListener("animationend", () => emoji.remove());
+
+      // 保険としての削除
       setTimeout(() => emoji.remove(), 8000);
     }
 
