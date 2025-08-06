@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", () => {
   ];
 
   const seasonalEmojis = {
-    spring: ["🌸", "🌸", "🌷"],
+    spring: ["🌸", "🍡", "🌷"],
     summer: ["🍧", "🎐", "🧊"],
     autumn: ["🍁", "🎃", "🍂"],
     winter: ["❄️", "⛄️", "🎄"]
