@@ -167,7 +167,8 @@ document.addEventListener("DOMContentLoaded", () => {
       emoji.style.fontSize = `${18 + Math.random() * 20}px`;
       emoji.style.opacity = (0.3 + Math.random() * 0.3).toFixed(2);
       emoji.style.animationDuration = `${3 + Math.random() * 4}s`;
-
+　　　　emoji.style.animationName = "fall-spin";
+      
       document.body.appendChild(emoji);
       setTimeout(() => emoji.remove(), 8000);
     }
