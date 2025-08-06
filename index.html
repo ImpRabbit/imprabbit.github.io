@@ -14,25 +14,36 @@
     <div id="dateDisplay"></div>
     <div id="timeDisplay"></div>
 
+    <!-- ✅ 朝昼晩・任意時間ボタン -->
     <div class="buttons"></div>
     <div id="customTimes"></div>
-    <div id="recordTableContainer"></div>
 
-    <div id="historyNav">
+    <!-- ✅ 任意時間追加 -->
+    <button id="addTimeButton">＋任意の時間を追加</button>
+    <div id="addTimeForm" style="display: none; margin-top: 10px;">
+      <input type="text" id="newTimeLabel" placeholder="例：就寝前・夜中など" style="padding: 8px; font-size: 16px;">
+      <button id="confirmAddTime" style="padding: 8px 12px; font-size: 16px; margin-left: 5px;">追加する</button>
+    </div>
+
+    <!-- ✅ 📅 週切り替えボタン（週単位履歴対応用）-->
+    <div id="weekNav" style="margin-top: 30px;">
+      <button id="prevWeek">← 前の週</button>
+      <button id="currentWeek">今週</button>
+      <button id="nextWeek">次の週 →</button>
+    </div>
+
+    <!-- ✅ 📆 日付変更ナビ（表の上） -->
+    <div id="historyNav" style="margin-top: 20px;">
       <button id="prevDay">←前日</button>
       <button id="today">今日</button>
       <button id="nextDay">翌日→</button>
     </div>
 
-    <button id="addTimeButton">＋任意の時間を追加</button>
-
-    <div id="addTimeForm" style="display: none; margin-top: 10px;">
-      <input type="text" id="newTimeLabel" placeholder="例：就寝前・夜中など" style="padding: 8px; font-size: 16px;">
-      <button id="confirmAddTime" style="padding: 8px 12px; font-size: 16px; margin-left: 5px;">追加する</button>
-    </div>
+    <!-- ✅ 📊 履歴テーブル（常に一番下） -->
+    <div id="recordTableContainer"></div>
   </div>
 
-  <!-- 💡 必ず最後に読み込む -->
+  <!-- ✅ スクリプト読込は最後に -->
   <script src="script.js"></script>
 </body>
 </html>
