@@ -95,6 +95,20 @@ button:active {
   margin: 10px auto;
 }
 
+/* 任意時間のボタンと削除ボタンのペア表示 */
+.custom-time-wrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 8px;
+}
+.custom-time-wrapper button:last-child {
+  background: #ddd;
+  color: #333;
+  font-size: 0.9rem;
+  padding: 6px 8px;
+}
+
 /* 任意時間フォーム */
 #addTimeForm {
   margin-top: 15px;
