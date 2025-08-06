@@ -263,15 +263,19 @@ body.winter {
   top: 0;
   z-index: 5;
   pointer-events: none;
-  opacity: 0.4;
-  font-size: 24px;
-  animation: fall linear;
   user-select: none;
+  animation-name: fall-spin;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
 }
 
-@keyframes fall {
-  to {
-    transform: translateY(100vh);
+@keyframes fall-spin {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(720deg);
     opacity: 0;
   }
 }
