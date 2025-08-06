@@ -186,6 +186,13 @@ button:active {
   font-weight: bold;
 }
 
+/* 表ヘッダーとセルの文字色を常に黒に固定する！ */
+.record-table th,
+.record-table td {
+  color: #000 !important;
+  background-color: #fff;
+}
+
 /* ✅ グラフ中央＆幅調整 */
 canvas#medChart {
   display: block;
