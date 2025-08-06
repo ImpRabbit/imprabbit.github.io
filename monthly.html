@@ -7,6 +7,31 @@
   <meta name="robots" content="noindex, nofollow">
   <link rel="stylesheet" href="style2.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    /* 🌟 絵文字演出のスタイル */
+    .falling-emoji {
+      position: fixed;
+      top: 0;
+      z-index: 10;
+      pointer-events: none;
+      opacity: 0.4;
+      animation: fall linear;
+      font-size: 24px;
+    }
+
+    @keyframes fall {
+      to {
+        transform: translateY(100vh);
+        opacity: 0;
+      }
+    }
+
+    /* 🌸 背景色：季節ごとに変化させる */
+    body.spring  { background-color: #ffe4ec; }   /* 4月：桜 */
+    body.summer  { background-color: #ccf2ff; }   /* 8月：かき氷 */
+    body.autumn  { background-color: #fff3e0; }   /* 10月：ハロウィン系 */
+    body.winter  { background-color: #e0f7fa; }   /* 1月・12月：雪・冬 */
+  </style>
 </head>
 <body>
   <!-- 🌟 中央寄せ用ラッパー -->
