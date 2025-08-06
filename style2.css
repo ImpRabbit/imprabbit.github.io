@@ -188,6 +188,15 @@ button:active {
   font-weight: bold;
 }
 
+/* グラフを中央寄せ＆最大幅制限 */
+canvas#medChart {
+  display: block;
+  margin: 0 auto;
+  max-width: 100%;
+  width: 100%;
+  height: auto;
+}
+
 /* 📱 スマホ向け調整 */
 @media (max-width: 480px) {
   html, body {
