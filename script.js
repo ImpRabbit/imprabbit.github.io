@@ -149,7 +149,7 @@ function render() {
     buttonsDiv.appendChild(btn);
   });
 
-  // 🔘 任意時間 + 削除ボタン付き
+  // 🔘 任意時間 + 削除ボタン（ふにゃふにゃ2段階式）
   customTimesDiv.innerHTML = "";
   (data.custom || []).forEach((entry) => {
     const wrapper = document.createElement("div");
@@ -168,23 +168,44 @@ function render() {
     };
 
     const del = document.createElement("button");
-    del.textContent = "❌";
+    del.textContent = "けす";
+    del.classList.add("youjo");
     del.style.marginLeft = "4px";
     del.style.fontSize = "14px";
     del.style.padding = "4px 6px";
+
     del.onclick = () => {
-      if (!confirm(`「${entry.label}」をすべて削除しますか？`)) return;
-      // すべての日付から削除
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (!key.startsWith("meds-")) continue;
-        const record = loadDay(key.replace("meds-", ""));
-        if (record.custom) {
-          record.custom = record.custom.filter(c => c.label !== entry.label);
-          saveDay(key.replace("meds-", ""), record);
+      const confirmWrapper = document.createElement("div");
+      confirmWrapper.style.display = "flex";
+      confirmWrapper.style.flexDirection = "column";
+      confirmWrapper.style.alignItems = "center";
+      confirmWrapper.style.gap = "4px";
+
+      const confirmBtn = document.createElement("button");
+      confirmBtn.textContent = "ほんとにけす！";
+      confirmBtn.classList.add("youjo");
+      confirmBtn.onclick = () => {
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (!key.startsWith("meds-")) continue;
+          const record = loadDay(key.replace("meds-", ""));
+          if (record.custom) {
+            record.custom = record.custom.filter(c => c.label !== entry.label);
+            saveDay(key.replace("meds-", ""), record);
+          }
         }
-      }
-      render();
+        render(); // 再描画して元に戻す
+      };
+
+      const cancelBtn = document.createElement("button");
+      cancelBtn.textContent = "やっぱけさない！";
+      cancelBtn.classList.add("youjo");
+      cancelBtn.onclick = () => render();
+
+      confirmWrapper.appendChild(confirmBtn);
+      confirmWrapper.appendChild(cancelBtn);
+
+      wrapper.replaceChild(confirmWrapper, del);
     };
 
     wrapper.appendChild(btn);
