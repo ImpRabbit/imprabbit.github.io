@@ -176,6 +176,13 @@ button:active {
   min-width: 60px;
 }
 
+/* 表ヘッダーとセルの文字色を常に黒に固定する！ */
+.record-table th,
+.record-table td {
+  color: #000 !important;
+  background-color: #fff;
+}
+
 /* ○×の色 */
 .record-table .circle {
   color: #2196f3;
@@ -184,13 +191,6 @@ button:active {
 .record-table .cross {
   color: #f44336;
   font-weight: bold;
-}
-
-/* 表ヘッダーとセルの文字色を常に黒に固定する！ */
-.record-table th,
-.record-table td {
-  color: #000 !important;
-  background-color: #fff;
 }
 
 /* ✅ グラフ中央＆幅調整 */
@@ -241,4 +241,37 @@ canvas#medChart {
 
 .youjo {
   font-family: 'Zen Maru Gothic', sans-serif;
+}
+
+/* 🌸 季節背景色（bodyにクラス追加） */
+body.spring {
+  background-color: #ffe4ec; /* 桜色 */
+}
+body.summer {
+  background-color: #ccf2ff; /* かき氷ブルー */
+}
+body.autumn {
+  background-color: #fff3e0; /* 秋っぽいオレンジベージュ */
+}
+body.winter {
+  background-color: #e0f7fa; /* 雪のような青白さ */
+}
+
+/* 🍧 絵文字降らし演出 */
+.falling-emoji {
+  position: fixed;
+  top: 0;
+  z-index: 5;
+  pointer-events: none;
+  opacity: 0.4;
+  font-size: 24px;
+  animation: fall linear;
+  user-select: none;
+}
+
+@keyframes fall {
+  to {
+    transform: translateY(100vh);
+    opacity: 0;
+  }
 }
