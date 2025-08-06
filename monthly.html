@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>月間服薬状況</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="stylesheet" href="style2.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="main-container">
+    <h1>📈 月間服薬状況</h1>
+
+    <!-- ✅ 月切り替えナビ -->
+    <div id="monthNav">
+      <button id="prevMonth">← 前の月</button>
+      <button id="currentMonth">今月</button>
+      <button id="nextMonth">次の月 →</button>
+    </div>
+
+    <!-- ✅ 表示対象の月（例：2025年7月） -->
+    <div id="monthDisplay" style="margin: 15px 0; font-size: 1.2rem;"></div>
+
+    <!-- ✅ 折れ線グラフ -->
+    <canvas id="medChart" width="400" height="250"></canvas>
+
+    <!-- ✅ 月間トータル服薬率 -->
+    <div id="monthlyRate" style="margin-top: 20px; font-size: 1.3rem;"></div>
+
+    <!-- ✅ 褒め顔文字エリア -->
+    <div id="praiseEmoji" style="font-size: 2rem; margin-top: 15px;"></div>
+
+    <!-- ✅ 戻るリンク -->
+    <a href="index.html" style="display: inline-block; margin-top: 30px; font-size: 1.1rem;">← 週間チェックに戻る</a>
+  </div>
+
+  <!-- ✅ 月間用JS -->
+  <script src="monthly.js"></script>
+</body>
+</html>
