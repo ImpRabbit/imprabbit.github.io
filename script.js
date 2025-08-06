@@ -1,4 +1,10 @@
-document.addEventListener("DOMContentLoaded", () => {
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", init);
+} else {
+  init();
+}
+
+function init() {
 // ==================== 🕒 現在時刻の表示 ====================
 const dateDisplay = document.getElementById('dateDisplay');
 const timeDisplay = document.getElementById('timeDisplay');
@@ -147,7 +153,7 @@ function generateRotatedRecordTable() {
   allTimeLabels.push(...customLabelsSet);
 
   const table = document.createElement("table");
-table.className = "record-table"; //
+  table.className = "record-table";
   const thead = document.createElement("thead");
   const headRow = document.createElement("tr");
   headRow.innerHTML = "<th>時間＼曜日</th>" + weekdays.map(day => `<th>${day}</th>`).join("");
@@ -181,7 +187,7 @@ table.className = "record-table"; //
 }
 
 // ==================== 💖 顔文字ふらし ====================
-const emojis = ["(𐊭 ∀ 𐊭ˋ)", "(◦`꒳´◦)", "( ˙꒳˙ )", "( 'ω' و(و"", "Σd(°∀°d)","(っ'-')╮ =͟͟͞͞💊"];
+const emojis = ["(𐊭 ∀ 𐊭ˋ)", "(◦`꒳´◦)", "( ˙꒳˙ )", "( 'ω' و(و\"", "Σd(°∀°d)", "(っ'-')╮ =͟͟͞͞💊"];
 function dropEmojis() {
   const emoji = document.createElement("div");
   emoji.className = "kaomoji";
@@ -201,4 +207,4 @@ function dropEmojis() {
 setInterval(dropEmojis, 600);
 
 render();
-});
+}
