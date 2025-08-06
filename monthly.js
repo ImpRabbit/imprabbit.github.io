@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const currentBtn = document.getElementById("currentMonth");
   const nextBtn = document.getElementById("nextMonth");
 
-  const emojis = [
+  const praiseEmojis = [
     "‧˚₊*̥(⁰͈꒨⁰͈∗︎*)‧˚", 
     "ﾌｫｫ――(⊙ω⊙)――ｯ!", 
     "(◦`꒳´◦)", 
@@ -16,6 +16,14 @@ document.addEventListener("DOMContentLoaded", () => {
     "Σd(°∀°d)", 
     "(𐊭 ∀ 𐊭ˋ)"
   ];
+
+  // 季節ごとの絵文字（降らす用）
+  const seasonalEmojis = {
+    spring: ["🌸", "🌸", "🌷"],
+    summer: ["🍧", "🌞", "🧊"],
+    autumn: ["🍁", "🎃", "🍂"],
+    winter: ["❄️", "⛄️", "🎄"]
+  };
 
   let chart = null;
   let currentMonth = new Date();
@@ -37,14 +45,27 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   function render() {
-    // 月情報表示
     const year = currentMonth.getFullYear();
     const month = currentMonth.getMonth(); // 0-indexed
     monthDisplay.textContent = `${year}年${month + 1}月`;
 
-    // 月初〜月末の日付取得
+    // 🌸 季節のクラスをbodyに追加
+    const body = document.body;
+    body.classList.remove("spring", "summer", "autumn", "winter");
+
+    let season = "spring"; // デフォルト
+    if ([11, 0].includes(month)) season = "winter";  // 12月, 1月
+    else if ([1, 2, 3].includes(month)) season = "spring";
+    else if ([6, 7].includes(month)) season = "summer"; // 7月, 8月
+    else if ([9, 10].includes(month)) season = "autumn";
+    else if ([4, 5].includes(month)) season = "summer"; // 初夏として夏に含む
+
+    body.classList.add(season);
+    startEmojiRain(seasonalEmojis[season]);
+
+    // 日付とデータ処理
     const start = new Date(year, month, 1);
-    const end = new Date(year, month + 1, 0); // 月末
+    const end = new Date(year, month + 1, 0);
     const daysInMonth = end.getDate();
 
     const labels = [];
@@ -111,14 +132,14 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
 
-    // 月間トータル率と褒め表示
+    // トータル表示
     praiseEmoji.innerHTML = "";
     if (totalPossible > 0) {
       const totalRate = (totalTaken / totalPossible) * 100;
       monthlyRate.textContent = `月間服薬率：${totalRate.toFixed(1)}%`;
 
       if (totalRate >= 90) {
-        const face = emojis[Math.floor(Math.random() * emojis.length)];
+        const face = praiseEmojis[Math.floor(Math.random() * praiseEmojis.length)];
         praiseEmoji.textContent = `${face} よくがんばったね〜！`;
       }
     } else {
@@ -136,6 +157,29 @@ document.addEventListener("DOMContentLoaded", () => {
     const m = String(date.getMonth() + 1).padStart(2, "0");
     const d = String(date.getDate()).padStart(2, "0");
     return `${y}-${m}-${d}`;
+  }
+
+  function startEmojiRain(emojiList) {
+    // 既存の絵文字削除
+    document.querySelectorAll(".falling-emoji").forEach(e => e.remove());
+
+    // 一定数の絵文字を降らせる（約20個）
+    for (let i = 0; i < 20; i++) {
+      const emoji = document.createElement("div");
+      emoji.className = "falling-emoji";
+      emoji.textContent = emojiList[Math.floor(Math.random() * emojiList.length)];
+      emoji.style.left = Math.random() * 100 + "vw";
+      emoji.style.animationDuration = 2 + Math.random() * 3 + "s";
+      emoji.style.fontSize = (18 + Math.random() * 20) + "px";
+      emoji.style.opacity = (0.3 + Math.random() * 0.3).toFixed(2);
+      document.body.appendChild(emoji);
+
+      // 一定時間で削除
+      setTimeout(() => emoji.remove(), 5000);
+    }
+
+    // 継続して降らせたい場合はループする：
+    setTimeout(() => startEmojiRain(emojiList), 3000); // 3秒ごとに再発生
   }
 
   render();
