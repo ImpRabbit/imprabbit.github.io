@@ -20,30 +20,28 @@ body.morning {
   background-color: #fff8dc;
   color: #333;
 }
-
 /* 🌤 昼 */
 body.noon {
   background-color: #ffffff;
   color: #222;
 }
-
 /* 🌇 夕方 */
 body.evening {
   background-color: #ffcc99;
   color: #fff;
 }
-
 /* 🌃 夜 */
 body.night {
   background-color: #1a1a40;
   color: #fff;
 }
 
+/* ✅ 中央寄せと余白調整 */
 .main-container {
-  width: 100%;
   max-width: 800px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 20px 24px; /* ← 横余白追加でズレ感解消！ */
+  box-sizing: border-box;
   text-align: center;
 }
 
@@ -66,7 +64,8 @@ h1 {
 /* ボタンエリア */
 .buttons,
 #customTimes,
-#historyNav {
+#historyNav,
+#monthNav {
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
@@ -135,7 +134,7 @@ button:active {
   color: #fff;
 }
 
-/* 顔文字 */
+/* 顔文字（降ってくるやつ） */
 .kaomoji {
   position: fixed;
   top: 0;
@@ -146,7 +145,6 @@ button:active {
   animation: fall-spin 4s linear forwards;
 }
 
-/* 落下アニメーション */
 @keyframes fall-spin {
   0% {
     transform: translateY(-10%) rotate(0deg);
@@ -188,13 +186,24 @@ button:active {
   font-weight: bold;
 }
 
-/* グラフを中央寄せ＆最大幅制限 */
+/* ✅ グラフ中央＆幅調整 */
 canvas#medChart {
   display: block;
   margin: 0 auto;
   max-width: 100%;
-  width: 100%;
+  width: 95%;  /* ← ← ← ここ追加！！ */
   height: auto;
+}
+
+/* ✅ 褒め顔文字中央化 */
+#praiseEmoji {
+  display: block;
+  margin: 20px auto;
+  text-align: center;
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 100%;
 }
 
 /* 📱 スマホ向け調整 */
@@ -219,13 +228,4 @@ canvas#medChart {
   .record-table {
     font-size: 0.9rem;
   }
-}
-#praiseEmoji {
-  display: block;
-  margin: 20px auto;
-  text-align: center;
-  position: relative;
-  left: 50%;
-  transform: translateX(-50%);
-  max-width: 100%;
 }
