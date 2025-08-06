@@ -35,7 +35,7 @@ function updateThemeByTime() {
 updateThemeByTime();
 setInterval(updateThemeByTime, 60 * 60 * 1000);
 
-// ==================== 📅 日付と曜日の取得 ====================
+// ==================== 📅 日付・週の処理 ====================
 function formatDate(date) {
   const y = date.getFullYear();
   const m = String(date.getMonth() + 1).padStart(2, "0");
@@ -45,15 +45,23 @@ function formatDate(date) {
 function getWeekday(date) {
   return "日月火水木金土"[date.getDay()];
 }
-function getPastDates(numDays = 7) {
-  const dates = [];
-  const today = new Date();
-  for (let i = 0; i < numDays; i++) {
-    const d = new Date();
-    d.setDate(today.getDate() - i);
-    dates.push(d);
+function getSunday(date) {
+  const d = new Date(date);
+  d.setDate(d.getDate() - d.getDay());
+  d.setHours(0, 0, 0, 0);
+  return d;
+}
+function getDatesOfWeek(sunday) {
+  const week = [];
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(sunday);
+    d.setDate(d.getDate() + i);
+    week.push(d);
   }
-  return dates.reverse();
+  return week;
+}
+function formatJapaneseDate(date) {
+  return `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`;
 }
 
 // ==================== 📦 保存・読み込み ====================
@@ -90,23 +98,44 @@ confirmAddTime.addEventListener('click', () => {
   render();
 });
 
-// ==================== 📋 服薬ボタン表示 ====================
+// ==================== 📋 メイン表示 ====================
 const buttonsDiv = document.querySelector('.buttons');
 const customTimesDiv = document.getElementById('customTimes');
-const prevDayBtn = document.getElementById('prevDay');
-const todayBtn = document.getElementById('today');
-const nextDayBtn = document.getElementById('nextDay');
-let currentDate = new Date();
+const weekRangeDisplay = document.getElementById('weekRange');
+const prevWeekBtn = document.getElementById('prevWeek');
+const currentWeekBtn = document.getElementById('currentWeek');
+const nextWeekBtn = document.getElementById('nextWeek');
 
-prevDayBtn.onclick = () => { currentDate.setDate(currentDate.getDate() - 1); render(); };
-todayBtn.onclick = () => { currentDate = new Date(); render(); };
-nextDayBtn.onclick = () => { currentDate.setDate(currentDate.getDate() + 1); render(); };
+let currentDate = new Date();
+let currentSunday = getSunday(currentDate);
+
+prevWeekBtn.onclick = () => {
+  currentSunday.setDate(currentSunday.getDate() - 7);
+  render();
+};
+currentWeekBtn.onclick = () => {
+  currentSunday = getSunday(new Date());
+  render();
+};
+nextWeekBtn.onclick = () => {
+  currentSunday.setDate(currentSunday.getDate() + 7);
+  render();
+};
 
 function render() {
-  const dateStr = formatDate(currentDate);
-  const data = loadDay(dateStr);
-  dateDisplay.textContent = `${formatDate(currentDate)}（${getWeekday(currentDate)}）`;
+  const today = new Date();
+  currentDate = today;
 
+  const weekDates = getDatesOfWeek(currentSunday);
+  const start = formatJapaneseDate(weekDates[0]);
+  const end = formatJapaneseDate(weekDates[6]);
+  weekRangeDisplay.textContent = `${start}〜${end}`;
+
+  const dateStr = formatDate(today);
+  const data = loadDay(dateStr);
+  dateDisplay.textContent = `${formatDate(today)}（${getWeekday(today)}）`;
+
+  // 🟦 朝昼晩ボタン
   buttonsDiv.innerHTML = "";
   ["朝", "昼", "晩"].forEach(time => {
     const btn = document.createElement("button");
@@ -120,8 +149,15 @@ function render() {
     buttonsDiv.appendChild(btn);
   });
 
+  // 🔘 任意時間 + 削除ボタン付き
   customTimesDiv.innerHTML = "";
-  (data.custom || []).forEach(entry => {
+  (data.custom || []).forEach((entry) => {
+    const wrapper = document.createElement("div");
+    wrapper.className = "custom-time-wrapper";
+    wrapper.style.display = "inline-flex";
+    wrapper.style.alignItems = "center";
+    wrapper.style.marginRight = "10px";
+
     const btn = document.createElement("button");
     btn.textContent = entry.label;
     btn.className = entry.taken ? "taken" : "not-taken";
@@ -130,17 +166,39 @@ function render() {
       saveDay(dateStr, data);
       render();
     };
-    customTimesDiv.appendChild(btn);
+
+    const del = document.createElement("button");
+    del.textContent = "❌";
+    del.style.marginLeft = "4px";
+    del.style.fontSize = "14px";
+    del.style.padding = "4px 6px";
+    del.onclick = () => {
+      if (!confirm(`「${entry.label}」をすべて削除しますか？`)) return;
+      // すべての日付から削除
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (!key.startsWith("meds-")) continue;
+        const record = loadDay(key.replace("meds-", ""));
+        if (record.custom) {
+          record.custom = record.custom.filter(c => c.label !== entry.label);
+          saveDay(key.replace("meds-", ""), record);
+        }
+      }
+      render();
+    };
+
+    wrapper.appendChild(btn);
+    wrapper.appendChild(del);
+    customTimesDiv.appendChild(wrapper);
   });
 
-  generateRotatedRecordTable();
+  generateRotatedRecordTable(weekDates);
 }
 
-// ==================== 📊 横型記録表（曜日） ====================
-function generateRotatedRecordTable() {
+// ==================== 📊 履歴表（1週間固定） ====================
+function generateRotatedRecordTable(dates) {
   const container = document.getElementById("recordTableContainer");
   container.innerHTML = "";
-  const dates = getPastDates(7);
   const dateStrs = dates.map(formatDate);
   const weekdays = dates.map(getWeekday);
 
