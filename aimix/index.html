@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#100d1d">
+<meta name="description" content="オケとボーカルをブラウザ内でMIXできる、iPhone対応のAI MIX Studio ベータ版。">
+<title>AI MIX Studio β</title>
+<style>
+:root{
+  --bg:#0d0a17;--panel:#171326;--panel2:#201a34;--line:#382f50;
+  --text:#faf7ff;--muted:#aca4bd;--purple:#9f7cff;--cyan:#62e5d3;
+  --pink:#ff84aa;--yellow:#ffd071;--ok:#9ff5d4;--shadow:0 20px 55px rgba(0,0,0,.32);
+}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;min-height:100vh;color:var(--text);background:
+ radial-gradient(circle at 10% -10%,rgba(159,124,255,.28),transparent 30rem),
+ radial-gradient(circle at 95% 12%,rgba(98,229,211,.15),transparent 28rem),var(--bg);
+ font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic UI",system-ui,sans-serif}
+button,input,select{font:inherit}button{touch-action:manipulation}
+a{color:inherit}
+.wrap{width:min(1160px,100%);margin:auto;padding:max(16px,env(safe-area-inset-top)) 14px calc(62px + env(safe-area-inset-bottom))}
+header{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:8px 2px 20px}
+.brand{display:flex;align-items:center;gap:12px}.logo{width:50px;height:50px;border-radius:17px;display:grid;place-items:center;font-size:25px;background:linear-gradient(135deg,var(--purple),#7054e4);box-shadow:0 12px 30px rgba(159,124,255,.3)}
+h1{margin:0;font-size:clamp(23px,5vw,36px);line-height:1}.sub{margin-top:6px;color:var(--muted);font-size:12px}
+.beta{padding:8px 11px;border-radius:999px;border:1px solid rgba(98,229,211,.35);background:rgba(98,229,211,.09);color:#d4fff8;font-weight:800;font-size:11px;white-space:nowrap}
+.hero{display:grid;grid-template-columns:1.1fr .9fr;gap:16px;margin-bottom:18px}.heroCard,.panel{border:1px solid var(--line);border-radius:22px;background:linear-gradient(180deg,rgba(32,26,52,.95),rgba(23,19,38,.96));box-shadow:var(--shadow)}
+.heroCard{padding:22px}.hero h2{font-size:clamp(25px,5vw,43px);line-height:1.15;margin:0 0 12px}.hero p{color:#c8c1d5;line-height:1.75;margin:0}.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:17px}.chip{font-size:11px;padding:7px 9px;border-radius:999px;background:rgba(255,255,255,.045);border:1px solid #403653;color:#ddd5e9}
+.note{display:flex;gap:10px;align-items:flex-start;margin-top:16px;padding:12px 13px;border-radius:15px;background:rgba(255,208,113,.075);border:1px solid rgba(255,208,113,.23);color:#ffe9b3;font-size:12px;line-height:1.6}
+.steps{padding:20px}.steps h3{margin:0 0 13px}.stepList{display:grid;gap:10px}.miniStep{display:grid;grid-template-columns:34px 1fr;gap:10px;align-items:start;padding:10px;border-radius:14px;background:rgba(255,255,255,.025)}.num{width:30px;height:30px;border-radius:10px;display:grid;place-items:center;background:rgba(159,124,255,.15);color:#dcd1ff;font-weight:900}.miniStep strong{font-size:13px}.miniStep small{display:block;color:var(--muted);margin-top:3px;line-height:1.45}
+.mainGrid{display:grid;grid-template-columns:1.15fr .85fr;gap:18px}.panel{padding:18px}.panel h2{font-size:18px;margin:0 0 6px}.lead{color:var(--muted);font-size:12px;line-height:1.6;margin:0 0 15px}
+.uploads{display:grid;grid-template-columns:1fr 1fr;gap:12px}.drop{position:relative;min-height:168px;border:1.5px dashed #5b4e78;border-radius:18px;padding:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;background:rgba(255,255,255,.018);overflow:hidden;transition:.18s}.drop.loaded{border-style:solid;border-color:rgba(98,229,211,.45);background:rgba(98,229,211,.035)}.drop input{position:absolute;inset:0;opacity:0;cursor:pointer}.drop .ico{font-size:30px;margin-bottom:8px}.drop strong{font-size:14px}.drop small{margin-top:7px;color:var(--muted);font-size:11px;line-height:1.5}.fileInfo{width:100%;margin-top:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#ddd5e9;font-size:11px}
+.section{margin-top:18px;padding-top:18px;border-top:1px solid var(--line)}.titleRow{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:12px}.titleRow h3{font-size:15px;margin:0}.hint{font-size:11px;color:var(--muted)}
+.presets{display:grid;grid-template-columns:repeat(5,1fr);gap:7px}.preset{border:1px solid var(--line);border-radius:13px;background:#181426;color:var(--text);padding:10px 5px;font-size:11px;font-weight:800;cursor:pointer}.preset.active{border-color:var(--purple);background:rgba(159,124,255,.16);box-shadow:0 0 0 3px rgba(159,124,255,.07)}
+.row{display:grid;grid-template-columns:130px 1fr 58px;gap:10px;align-items:center;margin:13px 0}.row label{font-size:12px}.val{text-align:right;color:#d8d0e7;font-size:11px;font-variant-numeric:tabular-nums}input[type=range]{width:100%;accent-color:var(--purple)}
+.switchRow{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:8px 0;font-size:12px}.switch{position:relative;width:48px;height:28px}.switch input{opacity:0;width:0;height:0}.slider{position:absolute;inset:0;border-radius:999px;background:#3a324b;cursor:pointer}.slider:before{content:"";position:absolute;width:22px;height:22px;left:3px;top:3px;background:white;border-radius:50%;transition:.18s}.switch input:checked+.slider{background:var(--purple)}.switch input:checked+.slider:before{transform:translateX(20px)}
+.actions{position:sticky;top:12px}.status{padding:12px 13px;border:1px solid var(--line);border-radius:15px;background:rgba(255,255,255,.025);font-size:12px;color:#ded7ea;line-height:1.6}.status.ok{border-color:rgba(98,229,211,.38);color:#d6fff8}.status.err{border-color:rgba(255,132,170,.45);color:#ffd2df}.progress{height:8px;border:1px solid #302843;border-radius:999px;background:#0f0c18;overflow:hidden;margin:12px 0}.progress>div{height:100%;width:0;background:linear-gradient(90deg,var(--purple),var(--cyan));transition:width .2s}
+.time{display:flex;justify-content:space-between;color:var(--muted);font-size:11px;margin:7px 1px}.timeline{width:100%;margin-top:13px}.buttons{display:grid;grid-template-columns:1fr 1fr;gap:9px}.btn{border:0;border-radius:15px;padding:13px 11px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px}.btn.primary{background:linear-gradient(135deg,var(--purple),#7458e8);color:white}.btn.secondary{background:#29233b;color:#eee9f8;border:1px solid #403650}.btn.auto{grid-column:1/-1;background:linear-gradient(135deg,var(--cyan),#37bfae);color:#072e29}.btn.export{grid-column:1/-1;background:linear-gradient(135deg,#ff9dbb,var(--pink));color:#3a0a19}.btn:disabled{opacity:.4;cursor:not-allowed}.ab{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:6px;border:1px solid var(--line);border-radius:14px;background:#120f1c;margin-top:11px}.ab button{border:0;border-radius:10px;padding:9px;background:transparent;color:var(--muted);font-weight:800}.ab button.active{background:#2a243d;color:#fff}
+.download{display:none;margin-top:14px;padding:13px;border:1px solid rgba(98,229,211,.3);background:rgba(98,229,211,.055);border-radius:15px}.download.show{display:block}.download a{display:inline-flex;margin-top:8px;padding:10px 12px;border-radius:12px;text-decoration:none;background:var(--cyan);color:#072e29;font-weight:900}
+.meter{height:9px;border:1px solid #302843;border-radius:999px;background:#0f0c18;overflow:hidden;margin-top:13px}.meter div{height:100%;width:0;background:linear-gradient(90deg,var(--cyan),var(--yellow),var(--pink));transition:width .08s}.meterText{display:flex;justify-content:space-between;margin-top:6px;color:var(--muted);font-size:10px}
+.pitchSoon{padding:12px;border-radius:14px;background:rgba(159,124,255,.055);border:1px solid rgba(159,124,255,.2);font-size:11px;line-height:1.6;color:#d9d1e7}.legal{margin-top:15px;color:#837b91;font-size:10px;line-height:1.7}.foot{text-align:center;color:#746d80;font-size:10px;margin-top:25px}
+@media(max-width:850px){.hero,.mainGrid{grid-template-columns:1fr}.actions{position:static}}
+@media(max-width:620px){.wrap{padding-left:10px;padding-right:10px}.heroCard,.steps,.panel{padding:15px;border-radius:19px}.uploads{grid-template-columns:1fr}.presets{grid-template-columns:repeat(2,1fr)}.preset:last-child{grid-column:1/-1}.row{grid-template-columns:105px 1fr 49px;gap:7px}.buttons{grid-template-columns:1fr}.btn.auto,.btn.export{grid-column:auto}.beta{font-size:9px}.hero h2{font-size:29px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="brand"><div class="logo">🎧</div><div><h1>AI MIX Studio</h1><div class="sub">iPhone・PC対応／ブラウザ内処理</div></div></div>
+  <div class="beta">PUBLIC BETA</div>
+</header>
+
+<section class="hero">
+  <div class="heroCard">
+    <h2>素材を入れて、<br>聴きながらMIX。</h2>
+    <p>オケとボーカルを選び、音量・位置・声の明るさ・リバーブを調整。完成した音源はWAVで保存できます。</p>
+    <div class="chips"><span class="chip">MP4 / MOV対応</span><span class="chip">外部送信なし</span><span class="chip">iPhone Safari対応</span><span class="chip">WAV書き出し</span></div>
+    <div class="note"><span>⚠️</span><span>現在は<strong>自動MIX機能のベータ版</strong>です。音程補正はまだ実装していません。見せかけで「補正済み」とは表示しません。</span></div>
+  </div>
+  <div class="heroCard steps">
+    <h3>使い方</h3>
+    <div class="stepList">
+      <div class="miniStep"><div class="num">1</div><div><strong>オケと歌声を選択</strong><small>「ファイル」や写真ライブラリ内の動画も選べます。</small></div></div>
+      <div class="miniStep"><div class="num">2</div><div><strong>おまかせ調整</strong><small>音量を解析し、ボーカルが埋もれにくい位置へ合わせます。</small></div></div>
+      <div class="miniStep"><div class="num">3</div><div><strong>試聴して微調整</strong><small>原音とMIXを切り替えながら確認できます。</small></div></div>
+      <div class="miniStep"><div class="num">4</div><div><strong>WAVで保存</strong><small>処理は端末内だけで行われます。</small></div></div>
+    </div>
+  </div>
+</section>
+
+<main class="mainGrid">
+<section class="panel">
+  <h2>1. 素材を選ぶ</h2>
+  <p class="lead">MP4・MOVは、動画内の音声トラックだけを使用します。端末やコーデックによっては読み込めない場合があります。</p>
+  <div class="uploads">
+    <label class="drop" id="dropBacking"><input id="backingInput" type="file" accept="audio/*,video/mp4,video/quicktime,.wav,.mp3,.m4a,.aac,.mp4,.mov,.webm"><div class="ico">🎼</div><strong>オケを選ぶ</strong><small>タップしてファイルを選択</small><div class="fileInfo" id="backingInfo">未選択</div></label>
+    <label class="drop" id="dropVocal"><input id="vocalInput" type="file" accept="audio/*,video/mp4,video/quicktime,.wav,.mp3,.m4a,.aac,.mp4,.mov,.webm"><div class="ico">🎤</div><strong>ボーカルを選ぶ</strong><small>頭出しはあとで調整できます</small><div class="fileInfo" id="vocalInfo">未選択</div></label>
+  </div>
+
+  <div class="section">
+    <div class="titleRow"><h3>2. 仕上がりを選ぶ</h3><span class="hint">あとから変更可能</span></div>
+    <div class="presets" id="presets">
+      <button class="preset active" data-preset="natural">ナチュラル</button><button class="preset" data-preset="clear">透明感</button><button class="preset" data-preset="power">パワフル</button><button class="preset" data-preset="soft">やわらか</button><button class="preset" data-preset="dry">ドライ</button>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="titleRow"><h3>3. MIXを調整</h3><span class="hint">再生中も変更可能</span></div>
+    <div class="row"><label>ボーカル音量</label><input id="vocalGain" type="range" min="-24" max="12" value="0" step="0.5"><div class="val" id="vocalGainVal">0 dB</div></div>
+    <div class="row"><label>オケ音量</label><input id="backingGain" type="range" min="-24" max="6" value="-3" step="0.5"><div class="val" id="backingGainVal">-3 dB</div></div>
+    <div class="row"><label>歌声の位置</label><input id="offset" type="range" min="-5" max="5" value="0" step="0.01"><div class="val" id="offsetVal">0.00 s</div></div>
+    <div class="row"><label>声の明るさ</label><input id="brightness" type="range" min="-12" max="12" value="2" step="0.5"><div class="val" id="brightnessVal">+2 dB</div></div>
+    <div class="row"><label>リバーブ</label><input id="reverb" type="range" min="0" max="70" value="18" step="1"><div class="val" id="reverbVal">18%</div></div>
+    <div class="switchRow"><span>コンプレッサーで声の音量差を整える</span><label class="switch"><input id="compressor" type="checkbox" checked><span class="slider"></span></label></div>
+  </div>
+
+  <div class="section">
+    <div class="titleRow"><h3>音程補正</h3><span class="hint">次の開発段階</span></div>
+    <div class="pitchSoon">🎼 音程検出・ナチュラル補正・強補正・ケロケロ補正は未実装です。現段階では、音声の音程を変更せずにMIXだけ行います。</div>
+  </div>
+</section>
+
+<aside class="panel actions">
+  <h2>4. 試聴・保存</h2>
+  <p class="lead">素材がそろうと操作できます。書き出し中は画面を閉じないでください。</p>
+  <div class="status" id="status">オケとボーカルを選択してください。</div>
+  <div class="progress"><div id="progressBar"></div></div>
+  <input class="timeline" id="timeline" type="range" min="0" max="1000" value="0" disabled>
+  <div class="time"><span id="currentTime">0:00.0</span><span id="totalTime">0:00.0</span></div>
+  <div class="buttons">
+    <button class="btn auto" id="autoBtn" disabled>✨ おまかせ調整</button>
+    <button class="btn primary" id="playBtn" disabled>▶ 再生</button>
+    <button class="btn secondary" id="stopBtn" disabled>■ 停止</button>
+    <button class="btn export" id="exportBtn" disabled>⬇ WAVを書き出す</button>
+  </div>
+  <div class="ab"><button id="originalBtn">原音</button><button id="mixBtn" class="active">MIX</button></div>
+  <div class="meter"><div id="meterBar"></div></div><div class="meterText"><span>出力レベル</span><span id="meterValue">-∞ dB</span></div>
+  <div class="download" id="downloadBox"><strong>完成しました ✨</strong><br><a id="downloadLink" download="ai-mix-studio.wav">WAVを保存</a></div>
+  <div class="legal">アップロードする素材について、使用・加工する権利を持っていることを確認してください。音源はサーバーへ送信されず、このブラウザ内だけで処理されます。</div>
+</aside>
+</main>
+<div class="foot">AI MIX Studio β — Local audio processing</div>
+</div>
+<script>
+(() => {
+'use strict';
+const $=id=>document.getElementById(id);
+const ui={backingInput:$('backingInput'),vocalInput:$('vocalInput'),backingInfo:$('backingInfo'),vocalInfo:$('vocalInfo'),dropBacking:$('dropBacking'),dropVocal:$('dropVocal'),status:$('status'),progress:$('progressBar'),timeline:$('timeline'),current:$('currentTime'),total:$('totalTime'),play:$('playBtn'),stop:$('stopBtn'),auto:$('autoBtn'),export:$('exportBtn'),original:$('originalBtn'),mix:$('mixBtn'),meter:$('meterBar'),meterValue:$('meterValue'),downloadBox:$('downloadBox'),downloadLink:$('downloadLink')};
+let ctx=null,backingBuffer=null,vocalBuffer=null,sources=[],graph=null,playing=false,startClock=0,position=0,duration=0,raf=0,mixMode=true,downloadUrl='';
+const settings={vocalGain:0,backingGain:-3,offset:0,brightness:2,reverb:18,compressor:true};
+const presets={natural:{vocalGain:0,backingGain:-3,brightness:2,reverb:18,compressor:true},clear:{vocalGain:1,backingGain:-4,brightness:5,reverb:16,compressor:true},power:{vocalGain:1.5,backingGain:-3,brightness:2.5,reverb:12,compressor:true},soft:{vocalGain:-.5,backingGain:-4,brightness:-1,reverb:28,compressor:true},dry:{vocalGain:0,backingGain:-3,brightness:1,reverb:3,compressor:true}};
+function audioContext(){if(!ctx)ctx=new(window.AudioContext||window.webkitAudioContext)();if(ctx.state==='suspended')ctx.resume();return ctx}
+function dbGain(db){return Math.pow(10,db/20)}
+function fmt(s){s=Math.max(0,Number(s)||0);const m=Math.floor(s/60),r=s-m*60;return `${m}:${r.toFixed(1).padStart(4,'0')}`}
+function size(n){return n<1048576?`${Math.round(n/1024)} KB`:`${(n/1048576).toFixed(1)} MB`}
+function status(text,type=''){ui.status.textContent=text;ui.status.className='status'+(type?' '+type:'')}
+function setProgress(v){ui.progress.style.width=Math.max(0,Math.min(100,v))+'%'}
+async function loadFile(file,kind){try{status(`${kind}を読み込んでいます…`);setProgress(12);const arr=await file.arrayBuffer();setProgress(35);const decoded=await audioContext().decodeAudioData(arr.slice(0));setProgress(65);if(kind==='オケ'){backingBuffer=decoded;ui.backingInfo.textContent=`${file.name}・${fmt(decoded.duration)}・${size(file.size)}`;ui.dropBacking.classList.add('loaded')}else{vocalBuffer=decoded;ui.vocalInfo.textContent=`${file.name}・${fmt(decoded.duration)}・${size(file.size)}`;ui.dropVocal.classList.add('loaded')}setProgress(100);setTimeout(()=>setProgress(0),350);ready()}catch(e){console.error(e);setProgress(0);status(`${kind}を読み込めませんでした。動画内の音声形式がSafari非対応の可能性があります。`,'err')}}
+function ready(){const ok=!!(backingBuffer&&vocalBuffer);ui.play.disabled=!ok;ui.auto.disabled=!ok;ui.export.disabled=!ok;ui.timeline.disabled=!ok;if(ok){duration=Math.max(backingBuffer.duration,Math.max(0,settings.offset)+vocalBuffer.duration);ui.timeline.max=Math.round(duration*1000);ui.total.textContent=fmt(duration);status('準備できました。まず「おまかせ調整」を試してください。','ok')}else status('オケとボーカルを選択してください。')}
+function impulse(ac,seconds=2,decay=2.5){const len=Math.floor(ac.sampleRate*seconds),b=ac.createBuffer(2,len,ac.sampleRate);for(let c=0;c<2;c++){const d=b.getChannelData(c);for(let i=0;i<len;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/len,decay)}return b}
+function createGraph(ac,destination,mode=true){const out=ac.createGain(),an=ac.createAnalyser();an.fftSize=1024;const bg=ac.createGain(),vg=ac.createGain(),eq=ac.createBiquadFilter(),dry=ac.createGain(),wet=ac.createGain(),conv=ac.createConvolver(),comp=ac.createDynamicsCompressor();bg.gain.value=mode?dbGain(settings.backingGain):1;vg.gain.value=mode?dbGain(settings.vocalGain):1;eq.type='highshelf';eq.frequency.value=4200;eq.gain.value=mode?settings.brightness:0;conv.buffer=impulse(ac);wet.gain.value=mode?settings.reverb/100*.8:0;dry.gain.value=1;comp.threshold.value=-22;comp.knee.value=18;comp.ratio.value=3.2;comp.attack.value=.008;comp.release.value=.22;bg.connect(out);vg.connect(eq);eq.connect(dry);eq.connect(conv);conv.connect(wet);dry.connect(out);wet.connect(out);if(mode&&settings.compressor){out.connect(comp);comp.connect(an)}else out.connect(an);an.connect(destination);return{bg,vg,eq,wet,an}}
+function stop(reset=true){sources.forEach(s=>{try{s.stop()}catch{}try{s.disconnect()}catch{}});sources=[];playing=false;cancelAnimationFrame(raf);ui.play.textContent='▶ 再生';ui.stop.disabled=true;ui.meter.style.width='0%';ui.meterValue.textContent='-∞ dB';if(reset){position=0;ui.timeline.value=0;ui.current.textContent=fmt(0)}}
+function playFrom(pos){const ac=audioContext();stop(false);graph=createGraph(ac,ac.destination,mixMode);const b=ac.createBufferSource(),v=ac.createBufferSource();b.buffer=backingBuffer;v.buffer=vocalBuffer;b.connect(graph.bg);v.connect(graph.vg);const now=ac.currentTime+.05;if(pos<backingBuffer.duration)b.start(now,Math.max(0,pos));const local=pos-settings.offset;if(local>=0&&local<vocalBuffer.duration)v.start(now,local);else if(local<0)v.start(now-local,0);sources=[b,v];playing=true;startClock=now-pos;position=pos;ui.play.textContent='⏸ 一時停止';ui.stop.disabled=false;meterLoop()}
+function meterLoop(){cancelAnimationFrame(raf);const data=new Uint8Array(1024);const tick=()=>{if(!playing||!graph)return;graph.an.getByteTimeDomainData(data);let sum=0;for(const x of data){const n=(x-128)/128;sum+=n*n}const rms=Math.sqrt(sum/data.length),db=rms?20*Math.log10(rms):-100,w=Math.max(0,Math.min(100,(db+60)/60*100));ui.meter.style.width=w+'%';ui.meterValue.textContent=db>-99?`${db.toFixed(1)} dB`:'-∞ dB';position=Math.max(0,Math.min(duration,audioContext().currentTime-startClock));ui.timeline.value=Math.round(position*1000);ui.current.textContent=fmt(position);if(position>=duration-.04){stop(true);return}raf=requestAnimationFrame(tick)};tick()}
+function live(){if(!graph||!playing)return;const t=audioContext().currentTime;graph.bg.gain.setTargetAtTime(mixMode?dbGain(settings.backingGain):1,t,.02);graph.vg.gain.setTargetAtTime(mixMode?dbGain(settings.vocalGain):1,t,.02);graph.eq.gain.setTargetAtTime(mixMode?settings.brightness:0,t,.02);graph.wet.gain.setTargetAtTime(mixMode?settings.reverb/100*.8:0,t,.02)}
+function rms(buffer){let sum=0,n=0;for(let c=0;c<buffer.numberOfChannels;c++){const d=buffer.getChannelData(c),step=Math.max(1,Math.floor(d.length/250000));for(let i=0;i<d.length;i+=step){sum+=d[i]*d[i];n++}}return Math.sqrt(sum/Math.max(1,n))}
+function autoMix(){if(!backingBuffer||!vocalBuffer)return;status('音量を解析しています…');setProgress(25);setTimeout(()=>{const br=rms(backingBuffer),vr=rms(vocalBuffer);const targetV=.12,targetB=.16;settings.vocalGain=Math.max(-12,Math.min(10,20*Math.log10(targetV/Math.max(vr,.00001))));settings.backingGain=Math.max(-12,Math.min(3,20*Math.log10(targetB/Math.max(br,.00001))));if(settings.vocalGain-settings.backingGain<2)settings.vocalGain=Math.min(10,settings.backingGain+2);$('vocalGain').value=settings.vocalGain.toFixed(1);$('backingGain').value=settings.backingGain.toFixed(1);updateLabels();setProgress(100);setTimeout(()=>setProgress(0),350);status('おまかせ調整が完了しました。再生して確認してください。','ok');live()},120)}
+function makeSource(ac,buffer,output,startTime,offset){const s=ac.createBufferSource();s.buffer=buffer;s.connect(output);s.start(startTime,Math.max(0,offset));return s}
+async function exportWav(){try{stop(true);status('WAVを書き出しています。画面を閉じないでください…');ui.export.disabled=true;setProgress(8);const rate=44100,length=Math.ceil(duration*rate),off=new OfflineAudioContext(2,length,rate),g=createGraph(off,off.destination,true),start=.01;makeSource(off,backingBuffer,g.bg,start,0);if(settings.offset>=0)makeSource(off,vocalBuffer,g.vg,start+settings.offset,0);else makeSource(off,vocalBuffer,g.vg,start,-settings.offset);setProgress(35);const rendered=await off.startRendering();setProgress(78);const blob=encodeWav(rendered);if(downloadUrl)URL.revokeObjectURL(downloadUrl);downloadUrl=URL.createObjectURL(blob);ui.downloadLink.href=downloadUrl;ui.downloadLink.download=`ai-mix-${new Date().toISOString().slice(0,10)}.wav`;ui.downloadBox.classList.add('show');setProgress(100);setTimeout(()=>setProgress(0),450);status('完成しました。WAVを保存できます。','ok')}catch(e){console.error(e);setProgress(0);status('書き出しに失敗しました。音源が長すぎる場合は、Safariのメモリ不足の可能性があります。','err')}finally{ui.export.disabled=false}}
+function encodeWav(buffer){const ch=buffer.numberOfChannels,rate=buffer.sampleRate,frames=buffer.length,bytes=2,ab=new ArrayBuffer(44+frames*ch*bytes),v=new DataView(ab);const str=(o,s)=>{for(let i=0;i<s.length;i++)v.setUint8(o+i,s.charCodeAt(i))};str(0,'RIFF');v.setUint32(4,36+frames*ch*bytes,true);str(8,'WAVE');str(12,'fmt ');v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,ch,true);v.setUint32(24,rate,true);v.setUint32(28,rate*ch*bytes,true);v.setUint16(32,ch*bytes,true);v.setUint16(34,16,true);str(36,'data');v.setUint32(40,frames*ch*bytes,true);const data=[];for(let c=0;c<ch;c++)data.push(buffer.getChannelData(c));let o=44;for(let i=0;i<frames;i++)for(let c=0;c<ch;c++){const x=Math.max(-1,Math.min(1,data[c][i]));v.setInt16(o,x<0?x*32768:x*32767,true);o+=2}return new Blob([ab],{type:'audio/wav'})}
+function updateLabels(){const values=[['vocalGain','vocalGainVal','db'],['backingGain','backingGainVal','db'],['offset','offsetVal','sec'],['brightness','brightnessVal','db'],['reverb','reverbVal','pct']];values.forEach(([id,out,type])=>{const x=Number($(id).value);settings[id]=x;$(out).textContent=type==='db'?`${x>0?'+':''}${x} dB`:type==='sec'?`${x>0?'+':''}${x.toFixed(2)} s`:`${Math.round(x)}%`});ready();live()}
+['vocalGain','backingGain','offset','brightness','reverb'].forEach(id=>$(id).addEventListener('input',()=>{updateLabels();if(id==='offset'&&playing)playFrom(position)}));
+$('compressor').addEventListener('change',e=>{settings.compressor=e.target.checked;if(playing)playFrom(position)});
+$('presets').addEventListener('click',e=>{const b=e.target.closest('.preset');if(!b)return;document.querySelectorAll('.preset').forEach(x=>x.classList.remove('active'));b.classList.add('active');Object.assign(settings,presets[b.dataset.preset]);['vocalGain','backingGain','brightness','reverb'].forEach(id=>$(id).value=settings[id]);$('compressor').checked=settings.compressor;updateLabels();if(playing)playFrom(position)});
+ui.backingInput.addEventListener('change',e=>e.target.files[0]&&loadFile(e.target.files[0],'オケ'));ui.vocalInput.addEventListener('change',e=>e.target.files[0]&&loadFile(e.target.files[0],'ボーカル'));
+ui.play.addEventListener('click',()=>{if(playing){position=Math.max(0,audioContext().currentTime-startClock);stop(false);ui.play.textContent='▶ 続きから'}else{if(position>=duration-.05)position=0;playFrom(position)}});ui.stop.addEventListener('click',()=>stop(true));ui.auto.addEventListener('click',autoMix);ui.export.addEventListener('click',exportWav);
+ui.timeline.addEventListener('input',()=>{position=Number(ui.timeline.value)/1000;ui.current.textContent=fmt(position);if(playing)playFrom(position)});
+ui.original.addEventListener('click',()=>{mixMode=false;ui.original.classList.add('active');ui.mix.classList.remove('active');live()});ui.mix.addEventListener('click',()=>{mixMode=true;ui.mix.classList.add('active');ui.original.classList.remove('active');live()});
+updateLabels();ready();
+})();
+</script>
+</body>
+</html>
