@@ -1,0 +1,11 @@
+{
+  "name": "ちっこいペスト医師のおくすりやさん",
+  "short_name": "おくすりやさん",
+  "description": "ちっこいペスト医師と薬を調合するミニゲーム",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#15121d",
+  "theme_color": "#201b2c",
+  "lang": "ja"
+}
