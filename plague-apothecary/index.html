@@ -36,7 +36,7 @@ body {
   <main class="game">
     <header>
       <div><span class="eyebrow">THE TINY APOTHECARY</span><h1>ちっこいペスト医師の<br>おくすりやさん</h1></div>
-      <button id="sound" class="icon" aria-label="音のオン・オフ">♪</button>
+      <button id="sound" class="icon" aria-label="音をオンにする">音♪</button>
     </header>
 
     <section class="stats" aria-label="ゲーム情報">
@@ -84,16 +84,21 @@ body {
 ];
 const icon={lavender:'🪻',berry:'🫐',mushroom:'🍄'};
 let state=JSON.parse(localStorage.getItem('tinyApothecary')||'null')||{day:1,coins:8,stars:0,stock:{lavender:4,berry:4,mushroom:4},recipe:0};
-let picked=[];let muted=false;let busy=false;
-const $=s=>document.querySelector(s),$=s=>document.querySelectorAll(s);
+let picked=[];let muted=true;let busy=false;let audioCtx=null;let musicTimer=null;
+const $=s=>document.querySelector(s),$$=s=>document.querySelectorAll(s);
 function save(){localStorage.setItem('tinyApothecary',JSON.stringify(state))}
 function render(){const r=recipes[state.recipe%recipes.length];$('#day').textContent=state.day;$('#coins').textContent=state.coins;$('#stars').textContent=state.stars;$('#customer').textContent=r.customer;$('#requestText').textContent=r.request;$('#medicineName').textContent=r.name+'をつくる';$('#reward').textContent=r.reward;Object.keys(state.stock).forEach(k=>{$('#stock-'+k).textContent=state.stock[k];document.querySelector(`[data-item="${k}"]`).classList.toggle('empty',state.stock[k]<1)});$('#slots').innerHTML=[0,1].map(i=>`<i>${picked[i]?icon[picked[i]]:'＋'}</i>`).join('');$('#brew').disabled=busy||picked.length!==2}
-function beep(ok=true){if(muted)return;const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;const a=new AC(),o=a.createOscillator(),g=a.createGain();o.frequency.value=ok?620:180;g.gain.setValueAtTime(.05,a.currentTime);g.gain.exponentialRampToValueAtTime(.001,a.currentTime+.18);o.connect(g).connect(a.destination);o.start();o.stop(a.currentTime+.18)}
+function ensureAudio(){const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return null;if(!audioCtx)audioCtx=new AC();if(audioCtx.state==='suspended')audioCtx.resume();return audioCtx}
+function tone(freq,duration=.18,volume=.035,delay=0,type='sine'){const a=ensureAudio();if(!a)return;const o=a.createOscillator(),g=a.createGain(),start=a.currentTime+delay;o.type=type;o.frequency.setValueAtTime(freq,start);g.gain.setValueAtTime(.001,start);g.gain.exponentialRampToValueAtTime(volume,start+.025);g.gain.exponentialRampToValueAtTime(.001,start+duration);o.connect(g).connect(a.destination);o.start(start);o.stop(start+duration+.03)}
+function beep(ok=true){if(muted)return;tone(ok?660:180,ok?.13:.22,ok?.04:.055,0,ok?'sine':'triangle')}
+function playPhrase(){if(muted)return;[392,494,587,494,440,523].forEach((note,i)=>tone(note,.55,.012,i*.42,'sine'))}
+function startMusic(){ensureAudio();playPhrase();clearInterval(musicTimer);musicTimer=setInterval(playPhrase,4200)}
+function stopMusic(){clearInterval(musicTimer);musicTimer=null}
 function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),1500)}
-$('.ingredients button').forEach(b=>b.onclick=()=>{const k=b.dataset.item;if(busy||picked.length>=2)return;if(state.stock[k]<1){toast('その材料は からっぽ！');beep(false);return}state.stock[k]--;picked.push(k);save();beep();render()});
+$$('.ingredients button').forEach(b=>b.onclick=()=>{const k=b.dataset.item;if(busy||picked.length>=2)return;if(state.stock[k]<1){toast('その材料は からっぽ！');beep(false);return}state.stock[k]--;picked.push(k);save();beep();render()});
 $('#brew').onclick=()=>{if(busy)return;busy=true;const r=recipes[state.recipe%recipes.length],correct=picked.every((x,i)=>x===r.items[i]);if(correct){state.coins+=r.reward;state.stars++;state.day++;state.recipe=(state.recipe+1)%recipes.length;save();$('#bubble').innerHTML=r.msg;toast('調合せいこう！ ★ひょうばん＋1');beep();render();setTimeout(()=>{picked=[];busy=false;$('#bubble').innerHTML='つぎの おきゃくさんです！<br>まちがえずに つくれるかな？';render()},900)}else{$('#bubble').innerHTML='むむっ、これは ちがう薬です…<br>順番にも気をつけてね';toast('調合しっぱい…');picked=[];busy=false;beep(false);save();render()}};
 $('#restock').onclick=()=>{if(state.coins<2){toast('おかねが たりません');beep(false);return}state.coins-=2;Object.keys(state.stock).forEach(k=>state.stock[k]+=2);toast('材料を 2こずつ補充したよ');save();render()};
-$('#sound').onclick=()=>{muted=!muted;$('#sound').textContent=muted?'×':'♪';toast(muted?'音をオフにしました':'音をオンにしました')};
+$('#sound').onclick=()=>{muted=!muted;$('#sound').textContent=muted?'音♪':'♪ ON';$('#sound').setAttribute('aria-label',muted?'音をオンにする':'音をオフにする');if(muted)stopMusic();else startMusic();toast(muted?'音をオフにしました':'音をオンにしました')};
 render();
 </script>
   <script>if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('./sw.js'))</script>
