@@ -1,9 +1,48 @@
-<!DOCTYPE html><html lang="ja"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><link rel="stylesheet" href="../css/style.css"/><title>総合練習</title><style>.lesson-layout{display:flex;flex-direction:column;align-items:center;gap:var(--space-lg);max-width:640px;margin:0 auto}.teacher-bar{display:flex;align-items:center;gap:var(--space-md);width:100%;background:var(--bg-card);border:1px solid #2a2a2a;border-radius:var(--radius-md);padding:8px 16px}.dialogue-box{width:100%;background:var(--bg-card);border:1px solid #2a2a2a;border-radius:8px;padding:16px;min-height:4em}.dialogue-box.correct{border-color:var(--gold)}.dialogue-box.wrong{border-color:var(--red)}.lesson-controls{display:flex;gap:8px;justify-content:center}.back-link{align-self:flex-start;color:var(--text-secondary);font-size:.9rem}</style></head><body><div class="page"><div class="container"><a href="../lessons.html" class="back-link">← レッスン一覧</a><div class="lesson-layout"><div class="teacher-bar"><div class="character-portrait" data-character="borsalino" style="width:52px;height:68px;border-color:var(--gold)"><span>ボル</span></div><div><div style="color:var(--gold);font-weight:500">ボルサリーノ</div><div style="font-size:.8rem;color:var(--text-muted)">初級 ― 総合</div></div></div><div class="dialogue-box" id="dialogue">...</div><div id="step-indicator" style="color:var(--text-muted);font-size:.85rem">1/1</div><div class="board-wrapper"><div id="board"></div></div><div class="lesson-controls"><button class="btn" id="btn-prev">前へ</button><button class="btn btn-gold" id="btn-next">次へ</button></div></div></div></div><script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script><script src="../js/chess-board.js"></script><script src="../js/progress.js"></script><script src="../js/lesson-extras.js"></script><script>
-const lessonData={id:"06-advanced",steps:[{type:"explain",fen:"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",text:"復習ですよォ。中央・展開・フォーク。"},{type:"practice",fen:"8/8/8/3q1k2/2N5/8/8/K7 w - - 0 1",highlight:["c4"],text:"【確認】フォークのマスへ。",correct:["c4e3"],correctText:"正解ですよォ。",wrongText:"e3へ。"},{type:"practice",fen:"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",highlight:["e2","d2"],text:"【確認】中央を。",correct:["e2e4","d2d4"],correctText:"正解ですよォ。",wrongText:"e4かd4を。"},{type:"explain",fen:"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",text:"あとは対局で感覚を掴んでくださいねェ。"}]};
-const dialogueEl=document.getElementById("dialogue"),stepEl=document.getElementById("step-indicator"),btnPrev=document.getElementById("btn-prev"),btnNext=document.getElementById("btn-next");let currentStep=0,practiceSolved=false;const board=window.__lessonBoard=new ChessBoardUI("board",{onMove:onBoardMove});
-function loadStep(i){currentStep=i;practiceSolved=false;const s=lessonData.steps[i];board.loadFen(s.fen);board.clearHighlights();if(s.highlight)s.highlight.forEach(sq=>{const el=board.container.querySelector(`[data-square="${sq}"]`);if(el)el.classList.add("highlight");});dialogueEl.textContent=s.text;dialogueEl.classList.remove("correct","wrong");stepEl.textContent=(i+1)+" / "+lessonData.steps.length;if(s.type==="practice"){btnNext.disabled=true;btnNext.textContent="正解後に次へ";}else{btnNext.disabled=false;btnNext.textContent=i>=lessonData.steps.length-1?"完了":"次へ";}btnPrev.disabled=i<=0;}
-function onBoardMove(move){const s=lessonData.steps[currentStep];if(s.type!=="practice"||practiceSolved)return;const uci=move.from+move.to;if((s.correct||[]).includes(uci)){practiceSolved=true;dialogueEl.textContent=s.correctText;dialogueEl.classList.add("correct");btnNext.disabled=false;btnNext.textContent=currentStep>=lessonData.steps.length-1?"完了":"次へ";}else{dialogueEl.textContent=s.wrongText;dialogueEl.classList.add("wrong");setTimeout(()=>board.undo(),600);}}
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="theme-color" content="#0a0a0c"/>
+<link rel="manifest" href="../manifest.webmanifest"/>
+<link rel="apple-touch-icon" href="../images/icon.svg"/>
+<title>総合練習 | 三大将チェス</title>
+<link rel="stylesheet" href="../css/style.css"/>
+<style>.lesson-layout{display:flex;flex-direction:column;align-items:center;gap:var(--space-lg);max-width:640px;margin:0 auto}.teacher-bar{display:flex;align-items:center;gap:var(--space-md);width:100%;background:var(--bg-card);border:1px solid #2a2a2a;border-radius:var(--radius-md);padding:var(--space-sm) var(--space-md)}.teacher-bar .character-portrait{width:52px;height:68px;font-size:.7rem;border-color:var(--gold)}.teacher-name{font-weight:500;color:var(--gold)}.dialogue-box{width:100%;background:var(--bg-card);border:1px solid #2a2a2a;border-radius:var(--radius-md);padding:var(--space-md) var(--space-lg);min-height:4.5em;line-height:1.6}.dialogue-box.correct{border-color:var(--gold)}.dialogue-box.wrong{border-color:var(--red)}.step-indicator{font-size:.85rem;color:var(--text-muted);text-align:center}.lesson-controls{display:flex;gap:var(--space-sm);justify-content:center}.back-link{align-self:flex-start;margin-bottom:var(--space-md);font-size:.9rem;color:var(--text-secondary)}.hint{font-size:.85rem;color:var(--text-muted);text-align:center}</style>
+</head>
+<body>
+<div class="page"><div class="container">
+<a href="../lessons.html" class="back-link">← レッスン一覧に戻る</a>
+<div class="lesson-layout">
+<div class="teacher-bar"><div class="character-portrait" data-character="borsalino"><span>ボル</span></div><div><div class="teacher-name">ボルサリーノ</div><div style="font-size:.8rem;color:var(--text-muted)">総合担当</div></div></div>
+<div class="dialogue-box" id="dialogue">読み込み中…</div>
+<div class="step-indicator" id="step-indicator">1 / 1</div>
+<div class="hint" id="hint"></div>
+<div class="board-wrapper"><div id="board"></div></div>
+<div class="lesson-controls"><button class="btn" id="btn-prev">前へ</button><button class="btn btn-gold" id="btn-next">次へ</button></div>
+</div></div></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+<script src="../js/chess-board.js"></script>
+<script src="../js/lesson-extras.js"></script>
+<script src="../js/progress.js"></script>
+<script>
+const lessonData={id:"06-advanced",steps:[
+{type:"explain",fen:"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",text:"おやおやァ…ここまでの復習ですよォ。中央、展開、チェック、フォーク。一通りやってきましたァ。"},
+{type:"explain",fen:"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",text:"対局では学んだことを試してくださいねェ。負けても、対局後に次のレッスンが示されますよォ。"},
+{type:"explain",fen:"8/8/8/3q1k2/2N5/8/8/K7 w - - 0 1",highlight:["c4"],text:"フォークの確認ですよォ。ナイトでキングとクイーンを同時に狙うマスを思い出してくださいねェ。"},
+{type:"practice",fen:"8/8/8/3q1k2/2N5/8/8/K7 w - - 0 1",highlight:["c4"],text:"【確認】フォークになるマスへナイトを。",correct:["c4e3"],correctText:"正解ですよォ。",wrongText:"ナイトをe3へ。"},
+{type:"explain",fen:"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",text:"中央のポーンも確認ですよォ。e4かd4が健全な一手ですよォ。"},
+{type:"practice",fen:"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",highlight:["e2","d2"],text:"【確認】中央の一手を。",correct:["e2e4","d2d4"],correctText:"正解ですよォ。",wrongText:"e4かd4を。"},
+{type:"explain",fen:"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",text:"初級はここまでですよォ。あとは三大将との対局で感覚を掴んでくださいねェ。中級もあるので、余裕ができたらどうぞォ。"},
+{type:"explain",fen:"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",text:"お疲れさまでしたァ。対局画面から相手と強さを選んで、実戦に入ってくださいねェ。"}
+]};
+const dialogueEl=document.getElementById("dialogue"),stepEl=document.getElementById("step-indicator"),hintEl=document.getElementById("hint"),btnPrev=document.getElementById("btn-prev"),btnNext=document.getElementById("btn-next");
+let currentStep=0,practiceSolved=false;
+const board=window.__lessonBoard=new ChessBoardUI("board",{onMove:onBoardMove});
+function loadStep(i){currentStep=i;practiceSolved=false;const s=lessonData.steps[i];board.loadFen(s.fen);board.clearHighlights();if(s.highlight)s.highlight.forEach(sq=>{const el=board.container.querySelector(`[data-square="${sq}"]`);if(el)el.classList.add("highlight");});dialogueEl.textContent=s.text;dialogueEl.classList.remove("correct","wrong");stepEl.textContent=(i+1)+" / "+lessonData.steps.length;if(s.type==="practice"){hintEl.textContent="駒を動かして正解を";btnNext.disabled=true;btnNext.textContent="正解後に次へ";}else{hintEl.textContent="";btnNext.disabled=false;btnNext.textContent=i>=lessonData.steps.length-1?"完了":"次へ";}btnPrev.disabled=i<=0;}
+function onBoardMove(move){const s=lessonData.steps[currentStep];if(s.type!=="practice"||practiceSolved)return;const uci=move.from+move.to+(move.promotion||"");if((s.correct||[]).includes(uci)||(s.correct||[]).includes(move.from+move.to)){practiceSolved=true;dialogueEl.textContent=s.correctText||"正解ですよォ。";dialogueEl.classList.add("correct");btnNext.disabled=false;btnNext.textContent=currentStep>=lessonData.steps.length-1?"完了":"次へ";}else{dialogueEl.textContent=s.wrongText||"違いますよォ。";dialogueEl.classList.add("wrong");setTimeout(()=>board.undo(),600);}}
 btnPrev.onclick=()=>{if(currentStep>0){loadStep(currentStep-1);Progress.setLessonStep("06-advanced",currentStep);}};
-btnNext.onclick=()=>{if(currentStep>=lessonData.steps.length-1){Progress.completeLesson("06-advanced");alert("初級は一通り終了です。");location.href="../lessons.html";return;}loadStep(currentStep+1);Progress.setLessonStep("06-advanced",currentStep);};
+btnNext.onclick=()=>{if(currentStep>=lessonData.steps.length-1){Progress.completeLesson("06-advanced");alert("「総合練習」を終えました。初級は一通り終了です。");location.href="../lessons.html";return;}loadStep(currentStep+1);Progress.setLessonStep("06-advanced",currentStep);};
 loadStep(0);
-</script></body></html>
+</script>
+</body></html>
