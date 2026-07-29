@@ -1,9 +1,68 @@
-<!DOCTYPE html><html lang="ja"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><link rel="stylesheet" href="../css/style.css"/><title>詰み入門</title><style>.lesson-layout{display:flex;flex-direction:column;align-items:center;gap:var(--space-lg);max-width:640px;margin:0 auto}.teacher-bar{display:flex;align-items:center;gap:var(--space-md);width:100%;background:var(--bg-card);border:1px solid #2a2a2a;border-radius:var(--radius-md);padding:8px 16px}.dialogue-box{width:100%;background:var(--bg-card);border:1px solid #2a2a2a;border-radius:8px;padding:16px;min-height:4em}.dialogue-box.correct{border-color:var(--gold)}.dialogue-box.wrong{border-color:var(--red)}.lesson-controls{display:flex;gap:8px;justify-content:center}.back-link{align-self:flex-start;color:var(--text-secondary);font-size:.9rem}</style></head><body><div class="page"><div class="container"><a href="../lessons.html" class="back-link">← レッスン一覧</a><div class="lesson-layout"><div class="teacher-bar"><div class="character-portrait" data-character="sakazuki" style="width:52px;height:68px;border-color:var(--red)"><span>サカ</span></div><div><div style="color:var(--red);font-weight:500">サカズキ</div><div style="font-size:.8rem;color:var(--text-muted)">初級 ― 詰み</div></div></div><div class="dialogue-box" id="dialogue">...</div><div id="step-indicator" style="color:var(--text-muted);font-size:.85rem">1/1</div><div id="hint" style="color:var(--text-muted);font-size:.85rem"></div><div class="board-wrapper"><div id="board"></div></div><div class="lesson-controls"><button class="btn" id="btn-prev">前へ</button><button class="btn btn-gold" id="btn-next">次へ</button></div></div></div></div><script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script><script src="../js/chess-board.js"></script><script src="../js/progress.js"></script><script src="../js/lesson-extras.js"></script><script>
-const lessonData={id:"03-practice",steps:[{type:"explain",fen:"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",text:"詰みはチェックをかけつつ逃げ道も塞いだ状態じゃ。"},{type:"practice",fen:"7k/5Q2/6K1/8/8/8/8/8 w - - 0 1",highlight:["f7"],text:"【問題】クイーンで詰みを。",correct:["f7f8","f7g7","f7h7"],correctText:"正解じゃ。",wrongText:"逃げられないチェックを。"},{type:"practice",fen:"7k/8/6K1/8/8/8/8/7R w - - 0 1",highlight:["h1"],text:"【問題】ルークでチェックを。",correct:["h1h8","h1h7","h1h6","h1h5","h1h4","h1h3","h1h2"],correctText:"正解じゃ。",wrongText:"h列にルークを。"},{type:"explain",fen:"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",text:"キングの逃げ道を常に見ろ。"}]};
-const dialogueEl=document.getElementById("dialogue"),stepEl=document.getElementById("step-indicator"),hintEl=document.getElementById("hint"),btnPrev=document.getElementById("btn-prev"),btnNext=document.getElementById("btn-next");let currentStep=0,practiceSolved=false;const board=window.__lessonBoard=new ChessBoardUI("board",{onMove:onBoardMove});
-function loadStep(i){currentStep=i;practiceSolved=false;const s=lessonData.steps[i];board.loadFen(s.fen);board.clearHighlights();if(s.highlight)s.highlight.forEach(sq=>{const el=board.container.querySelector(`[data-square="${sq}"]`);if(el)el.classList.add("highlight");});dialogueEl.textContent=s.text;dialogueEl.classList.remove("correct","wrong");stepEl.textContent=(i+1)+" / "+lessonData.steps.length;if(s.type==="practice"){hintEl.textContent="駒を動かして正解を";btnNext.disabled=true;btnNext.textContent="正解後に次へ";}else{hintEl.textContent="";btnNext.disabled=false;btnNext.textContent=i>=lessonData.steps.length-1?"完了":"次へ";}btnPrev.disabled=i<=0;}
-function onBoardMove(move){const s=lessonData.steps[currentStep];if(s.type!=="practice"||practiceSolved)return;const uci=move.from+move.to+(move.promotion||"");if((s.correct||[]).includes(uci)||(s.correct||[]).includes(move.from+move.to)){practiceSolved=true;dialogueEl.textContent=s.correctText||"正解じゃ。";dialogueEl.classList.add("correct");btnNext.disabled=false;btnNext.textContent=currentStep>=lessonData.steps.length-1?"完了":"次へ";}else{dialogueEl.textContent=s.wrongText||"違うぞ。";dialogueEl.classList.add("wrong");setTimeout(()=>board.undo(),600);}}
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="theme-color" content="#0a0a0c"/>
+<link rel="manifest" href="../manifest.webmanifest"/>
+<link rel="apple-touch-icon" href="../images/icon.svg"/>
+<title>詰み入門 | 三大将チェス</title>
+<link rel="stylesheet" href="../css/style.css"/>
+<style>.lesson-layout{display:flex;flex-direction:column;align-items:center;gap:var(--space-lg);max-width:640px;margin:0 auto}.teacher-bar{display:flex;align-items:center;gap:var(--space-md);width:100%;background:var(--bg-card);border:1px solid #2a2a2a;border-radius:var(--radius-md);padding:var(--space-sm) var(--space-md)}.teacher-bar .character-portrait{width:52px;height:68px;font-size:.7rem;border-color:var(--red)}.teacher-name{font-weight:500;color:var(--red)}.dialogue-box{width:100%;background:var(--bg-card);border:1px solid #2a2a2a;border-radius:var(--radius-md);padding:var(--space-md) var(--space-lg);min-height:4.5em;line-height:1.6}.dialogue-box.correct{border-color:var(--gold)}.dialogue-box.wrong{border-color:var(--red)}.step-indicator{font-size:.85rem;color:var(--text-muted);text-align:center}.lesson-controls{display:flex;gap:var(--space-sm);justify-content:center}.back-link{align-self:flex-start;margin-bottom:var(--space-md);font-size:.9rem;color:var(--text-secondary)}.hint{font-size:.85rem;color:var(--text-muted);text-align:center}</style>
+</head>
+<body>
+<div class="page"><div class="container">
+<a href="../lessons.html" class="back-link">← レッスン一覧に戻る</a>
+<div class="lesson-layout">
+<div class="teacher-bar"><div class="character-portrait" data-character="sakazuki"><span>サカ</span></div><div><div class="teacher-name">サカズキ</div><div style="font-size:.8rem;color:var(--text-muted)">詰み担当</div></div></div>
+<div class="dialogue-box" id="dialogue">読み込み中…</div>
+<div class="step-indicator" id="step-indicator">1 / 1</div>
+<div class="hint" id="hint"></div>
+<div class="board-wrapper"><div id="board"></div></div>
+<div class="lesson-controls"><button class="btn" id="btn-prev">前へ</button><button class="btn btn-gold" id="btn-next">次へ</button></div>
+</div></div></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+<script src="../js/chess-board.js"></script>
+<script src="../js/lesson-extras.js"></script>
+<script src="../js/progress.js"></script>
+<script>
+const lessonData = {
+  id: "03-practice",
+  steps: [
+    { type:"explain", fen:"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+      text:"詰み（チェックメイト）を叩き込む。チェックはキングが取られる状態。詰みは、チェックをかけつつ逃げ道も塞いだ状態じゃ。取っても逃げてもブロックもできん。" },
+    { type:"explain", fen:"7k/5Q2/6K1/8/8/8/8/8 w - - 0 1", highlight:["f7","h8"],
+      text:"この図を見ろ。白クイーンがf7、黒キングがh8。クイーンを適切なマスに動かせば逃げ道がなくなり詰みになる。" },
+    { type:"explain", fen:"7k/5Q2/6K1/8/8/8/8/8 w - - 0 1",
+      text:"詰みを目指す意識を持て。駒を取り合うだけじゃ勝てん。キングの逃げ道を常に計算しろ。" },
+    { type:"practice", fen:"7k/5Q2/6K1/8/8/8/8/8 w - - 0 1", highlight:["f7"],
+      text:"【問題1】クイーンで詰みを完成させろ。",
+      correct:["f7f8","f7g7","f7h7"],
+      correctText:"正解じゃ。これが詰みの形だ。",
+      wrongText:"クイーンを動かして、キングが逃げられないチェックにしろ。" },
+    { type:"practice", fen:"7k/8/6K1/8/8/8/8/7R w - - 0 1", highlight:["h1"],
+      text:"【問題2】ルークでチェックをかけろ。",
+      correct:["h1h8","h1h7","h1h6","h1h5","h1h4","h1h3","h1h2"],
+      correctText:"正解じゃ。縦の筋でチェックだ。",
+      wrongText:"ルークをh列に置け。" },
+    { type:"explain", fen:"6k1/5ppp/8/8/8/8/8/R5K1 w - - 0 1", highlight:["a1","g8"],
+      text:"バックランクメイトも覚えろ。最終段（1段目・8段目）のキングが、自分のポーンに塞がれて逃げられず詰む形じゃ。" },
+    { type:"practice", fen:"6k1/5ppp/8/8/8/8/8/1R4K1 w - - 0 1", highlight:["b1"],
+      text:"【問題3】このルークでバックランクメイトを決めろ。",
+      correct:["b1b8"],
+      correctText:"正解じゃ。8段目にルークを置けば詰みだ。",
+      wrongText:"ルークをb8へ。" },
+    { type:"explain", fen:"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+      text:"要点は、チェックと逃げ道の両方を見ることじゃ。対局でも『相手キングはどこへ逃げられるか』を一手ごとに確認しろ。" }
+  ]
+};
+const dialogueEl=document.getElementById("dialogue"),stepEl=document.getElementById("step-indicator"),hintEl=document.getElementById("hint"),btnPrev=document.getElementById("btn-prev"),btnNext=document.getElementById("btn-next");
+let currentStep=0,practiceSolved=false;
+const board=window.__lessonBoard=new ChessBoardUI("board",{onMove:onBoardMove});
+function loadStep(i){currentStep=i;practiceSolved=false;const s=lessonData.steps[i];board.loadFen(s.fen);board.clearHighlights();if(s.highlight)s.highlight.forEach(sq=>{const el=board.container.querySelector(`[data-square="${sq}"]`);if(el)el.classList.add("highlight");});dialogueEl.textContent=s.text;dialogueEl.classList.remove("correct","wrong");stepEl.textContent=(i+1)+" / "+lessonData.steps.length;if(s.type==="practice"){hintEl.textContent="駒を動かして正解を探してください";btnNext.disabled=true;btnNext.textContent="正解を出してから次へ";}else{hintEl.textContent="";btnNext.disabled=false;btnNext.textContent=i>=lessonData.steps.length-1?"完了":"次へ";}btnPrev.disabled=i<=0;}
+function onBoardMove(move){const s=lessonData.steps[currentStep];if(s.type!=="practice"||practiceSolved)return;const uci=move.from+move.to+(move.promotion||"");if((s.correct||[]).includes(uci)||(s.correct||[]).includes(move.from+move.to)){practiceSolved=true;dialogueEl.textContent=s.correctText||"正解じゃ。";dialogueEl.classList.add("correct");hintEl.textContent="正解！";btnNext.disabled=false;btnNext.textContent=currentStep>=lessonData.steps.length-1?"完了":"次へ";}else{dialogueEl.textContent=s.wrongText||"違うぞ。";dialogueEl.classList.add("wrong");setTimeout(()=>board.undo(),600);}}
 btnPrev.onclick=()=>{if(currentStep>0){loadStep(currentStep-1);Progress.setLessonStep("03-practice",currentStep);}};
 btnNext.onclick=()=>{if(currentStep>=lessonData.steps.length-1){Progress.completeLesson("03-practice");alert("「詰み入門」を終えました。");location.href="../lessons.html";return;}loadStep(currentStep+1);Progress.setLessonStep("03-practice",currentStep);};
 loadStep(0);
-</script></body></html>
+</script>
+</body></html>
