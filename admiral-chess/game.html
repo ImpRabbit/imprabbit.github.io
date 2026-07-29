@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="theme-color" content="#0a0a0c"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<link rel="manifest" href="manifest.webmanifest"/>
+<link rel="apple-touch-icon" href="images/icon.svg"/>
+<title>対局 | 三大将チェス</title>
+<link rel="stylesheet" href="css/style.css"/>
+<style>
+.game-layout{display:flex;flex-direction:column;align-items:center;gap:var(--space-md);max-width:520px;margin:0 auto}
+.opponent-bar{display:flex;align-items:center;gap:var(--space-md);width:100%;background:var(--bg-card);border:1px solid #2a2a2a;border-radius:var(--radius-md);padding:var(--space-sm) var(--space-md)}
+.opponent-bar .character-portrait{width:48px;height:60px;font-size:.65rem}
+.opponent-name{font-weight:500}.opponent-status{font-size:.8rem;color:var(--text-muted)}
+.dialogue{width:100%;background:var(--bg-card);border:1px solid #2a2a2a;border-radius:var(--radius-md);padding:var(--space-md);min-height:3.5em}
+.dialogue .speaker{font-size:.8rem;margin-bottom:4px}
+.status-bar{text-align:center;color:var(--text-secondary);font-size:.9rem}
+.controls-row{display:flex;gap:var(--space-sm);flex-wrap:wrap;justify-content:center}
+.post-tip{width:100%;margin-top:var(--space-md);padding:var(--space-md);background:var(--bg-card);border:1px solid #2a2a2a;border-radius:var(--radius-md);font-size:.9rem;color:var(--text-secondary);display:none}
+.post-tip.visible{display:block}.post-tip strong{color:var(--gold)}.post-tip a{color:var(--gold)}
+.back-link{align-self:flex-start;font-size:.9rem;color:var(--text-secondary)}
+</style>
+</head>
+<body>
+<div class="page"><div class="container">
+<a href="play.html" class="back-link">← 相手選択に戻る</a>
+<div class="game-layout">
+<div class="opponent-bar">
+<div class="character-portrait" id="opponent-portrait"><span id="opponent-short">?</span></div>
+<div><div class="opponent-name" id="opponent-name">...</div><div class="opponent-status" id="opponent-status">対局中</div></div>
+</div>
+<div class="dialogue"><div class="speaker" id="dialogue-speaker"></div><div id="dialogue-text">...</div></div>
+<div class="board-wrapper"><div id="board"></div><div class="status-bar" id="status">準備中…</div></div>
+<div class="controls-row">
+<button class="btn" id="btn-undo">一手戻す</button>
+<button class="btn" id="btn-resign">投了する</button>
+<button class="btn btn-gold" id="btn-new">もう一度</button>
+<a href="lessons.html" class="btn">レッスンへ</a>
+</div>
+<div class="post-tip" id="post-tip"></div>
+</div></div></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+<script src="js/chess-board.js"></script>
+<script src="js/simple-ai.js"></script>
+<script src="js/stockfish-ai.js"></script>
+<script src="js/progress.js"></script>
+<script>
+const ADMIRALS={
+sakazuki:{name:"サカズキ",short:"サカ",colorClass:"accent-red",border:"var(--red)",skill:14,lines:{start:["来るがええ。","徹底的にやる。"],playerMove:["…ふん。","甘いのう。"],aiMove:["当然じゃろ。"],capture:["取ったまでじゃ。"],fork:["両取りじゃ。"],check:["チェックじゃ。"],win:["当然の結果じゃ。"],lose:["…今日はここまでじゃ。"],draw:["引き分けか…まあええ。"]}},
+kuzan:{name:"クザン",short:"クザ",colorClass:"accent-blue",border:"var(--blue)",skill:8,lines:{start:["軽くやろうぜ。"],playerMove:["ふむ…","なるほどね。"],aiMove:["これでどうだ。"],capture:["わりぃな…取っちまった。"],fork:["両取りだな…わりぃな。"],check:["チェックだぞ。"],win:["勝っちまったな。"],lose:["あらら…負けたか。"],draw:["引き分けか。"]}},
+borsalino:{name:"ボルサリーノ",short:"ボル",colorClass:"accent-gold",border:"var(--gold)",skill:11,lines:{start:["おやおやァ…始めますかァ。"],playerMove:["ほう…","面白いねェ。"],aiMove:["こうですねェ。"],capture:["すまないねぇ…もらいますよォ。"],fork:["両取りですよォ…すまないねぇ。"],check:["チェックですよォ。"],win:["勝ちましたァ。"],lose:["おやおやァ…負けちゃいましたァ。"],draw:["引き分けですかァ…。"]}}
+};
+const params=new URLSearchParams(location.search);
+const opponentKey=params.get("vs")||"kuzan";
+const skillParam=parseInt(params.get("skill")||"12",10);
+let colorParam=params.get("color")||"white";
+if(colorParam==="random")colorParam=Math.random()<0.5?"white":"black";
+if(colorParam!=="black")colorParam="white";
+const playerIsWhite=colorParam==="white";
+const playerColor=playerIsWhite?"w":"b";
+const admiral=ADMIRALS[opponentKey]||ADMIRALS.kuzan;
+admiral.skill=skillParam;
+const skillNames={4:"初心者",8:"中級者",12:"上級者",16:"プロ",19:"トッププロ"};
+const dialogueSpeaker=document.getElementById("dialogue-speaker");
+const dialogueText=document.getElementById("dialogue-text");
+const statusEl=document.getElementById("status");
+const opponentNameEl=document.getElementById("opponent-name");
+const opponentStatusEl=document.getElementById("opponent-status");
+const opponentPortrait=document.getElementById("opponent-portrait");
+const opponentShort=document.getElementById("opponent-short");
+const postTipEl=document.getElementById("post-tip");
+opponentNameEl.textContent=admiral.name;
+opponentNameEl.className="opponent-name "+admiral.colorClass;
+opponentShort.textContent=admiral.short;
+opponentPortrait.style.borderColor=admiral.border;
+opponentStatusEl.textContent=(skillNames[skillParam]||"上級者")+" ｜ 対局中";
+function say(key){const lines=admiral.lines[key];if(!lines||!lines.length)return;const line=lines[Math.floor(Math.random()*lines.length)];dialogueSpeaker.textContent=admiral.name;dialogueSpeaker.className="speaker "+admiral.colorClass;dialogueText.textContent=line;}
+function showPostTip(kind){const tips={win:["勝ちだ。終盤の勝ち切りを復習しておけ（レッスン09）。"],loss:["負けは学びだ。典型的な失敗を見直せ（レッスン07）。","相手の脅威を一手ごとに確認しろ（レッスン11）。"],draw:["引き分けも悪くない。ポーンの前進を振り返れ（レッスン12）。"],resign:["投了か。レッスンで弱点を潰してから再挑戦しろ（レッスン07）。"]};const list=tips[kind]||tips.loss;const tip=list[Math.floor(Math.random()*list.length)];postTipEl.innerHTML="<strong>"+admiral.name+"より</strong><br>"+tip+"<br><br><a href=\"lessons.html\">レッスン一覧へ</a> ｜ <a href=\"play.html\">相手を変える</a>";postTipEl.classList.add("visible");}
+function hidePostTip(){postTipEl.classList.remove("visible");postTipEl.innerHTML="";}
+const ai=new StockfishAI({skill:admiral.skill||10,movetime:1000});
+let thinking=false,gameRecorded=false;
+function onPlayerMove(){updateStatus();if(board.isGameOver())return;say("playerMove");runAiTurn();}
+const board=new ChessBoardUI("board",{onMove:onPlayerMove,orientation:playerIsWhite?"white":"black",playerColor:playerColor});
+function updateStatus(){
+if(board.isCheckmate()){const winnerIsWhite=board.turn()==="b";const winnerLabel=winnerIsWhite?"白":"黒";const playerWon=(winnerIsWhite&&playerIsWhite)||(!winnerIsWhite&&!playerIsWhite);statusEl.textContent="チェックメイト！ "+winnerLabel+"の勝ち";if(playerWon){say("lose");opponentStatusEl.textContent="敗北…";if(!gameRecorded){Progress.recordGame("win");gameRecorded=true;board.setLocked(true);showPostTip("win");}}else{say("win");opponentStatusEl.textContent="勝利";if(!gameRecorded){Progress.recordGame("loss");gameRecorded=true;board.setLocked(true);showPostTip("loss");}}}
+else if(board.isDraw()){statusEl.textContent="引き分けです";say("draw");opponentStatusEl.textContent="引き分け";if(!gameRecorded){Progress.recordGame("draw");gameRecorded=true;board.setLocked(true);showPostTip("draw");}}
+else if(board.isCheck()){const side=board.turn()==="w"?"白":"黒";const you=board.turn()===playerColor?"（あなた）":"（相手）";statusEl.textContent=side+"の番です"+you+"（チェック！）";}
+else{const side=board.turn()==="w"?"白":"黒";const you=board.turn()===playerColor?"（あなた）":"（相手）";statusEl.textContent=side+"の番です"+you;}
+}
+async function runAiTurn(){if(board.isGameOver())return;thinking=true;board.setLocked(true);opponentStatusEl.textContent="考え中…";statusEl.textContent="相手が考えています…";try{const move=await ai.playMove(board);if(move){if(move.captured){if(board.isCheck()||"qrb".includes(move.captured))say("fork");else say("capture");}else if(board.isCheck())say("check");else say("aiMove");}}catch(e){console.warn(e);}thinking=false;if(!board.isGameOver()){board.setLocked(false);opponentStatusEl.textContent=(skillNames[skillParam]||"上級者")+" ｜ 対局中";}updateStatus();}
+document.getElementById("btn-undo").addEventListener("click",()=>{if(thinking||gameRecorded)return;board.undo();if(board.turn()!==playerColor)board.undo();board.setLocked(false);hidePostTip();opponentStatusEl.textContent=(skillNames[skillParam]||"上級者")+" ｜ 対局中";updateStatus();});
+document.getElementById("btn-resign").addEventListener("click",()=>{if(thinking||gameRecorded)return;say("win");statusEl.textContent="投了しました。"+(playerIsWhite?"黒":"白")+"の勝ち";opponentStatusEl.textContent="勝利";board.setLocked(true);Progress.recordGame("loss");gameRecorded=true;showPostTip("resign");});
+document.getElementById("btn-new").addEventListener("click",()=>{board.reset();thinking=false;gameRecorded=false;board.setLocked(false);hidePostTip();opponentStatusEl.textContent=(skillNames[skillParam]||"上級者")+" ｜ 対局中";say("start");updateStatus();if(!playerIsWhite)runAiTurn();});
+say("start");statusEl.textContent=playerIsWhite?"あなたは白（先手）":"あなたは黒（後手）";
+setTimeout(()=>{updateStatus();if(!playerIsWhite)runAiTurn();},400);
+</script>
+</body>
+</html>
