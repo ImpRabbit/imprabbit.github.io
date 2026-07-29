@@ -1,91 +1,155 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<meta name="theme-color" content="#0a0a0c"/>
-<link rel="manifest" href="../manifest.webmanifest"/>
-<link rel="apple-touch-icon" href="../images/icon.svg"/>
-<title>基礎編 | 三大将チェス</title>
-<link rel="stylesheet" href="../css/style.css"/>
-<style>
-.lesson-layout{display:flex;flex-direction:column;align-items:center;gap:var(--space-lg);max-width:640px;margin:0 auto}
-.teacher-bar{display:flex;align-items:center;gap:var(--space-md);width:100%;background:var(--bg-card);border:1px solid #2a2a2a;border-radius:var(--radius-md);padding:var(--space-sm) var(--space-md)}
-.teacher-bar .character-portrait{width:52px;height:68px;font-size:.7rem;border-color:var(--red)}
-.teacher-name{font-weight:500;color:var(--red)}
-.dialogue-box{width:100%;background:var(--bg-card);border:1px solid #2a2a2a;border-radius:var(--radius-md);padding:var(--space-md) var(--space-lg);min-height:4.5em;line-height:1.6}
-.dialogue-box.correct{border-color:var(--gold)}.dialogue-box.wrong{border-color:var(--red)}
-.step-indicator{font-size:.85rem;color:var(--text-muted);text-align:center}
-.lesson-controls{display:flex;gap:var(--space-sm);justify-content:center;flex-wrap:wrap}
-.back-link{align-self:flex-start;margin-bottom:var(--space-md);font-size:.9rem;color:var(--text-secondary)}
-.hint{font-size:.85rem;color:var(--text-muted);text-align:center}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0a0a0c" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="三大将チェス" />
+  <link rel="manifest" href="../manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="../images/icon.svg" />
+  <title>基礎編 | 三大将チェス</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <style>
+    .lesson-layout{display:flex;flex-direction:column;align-items:center;gap:var(--space-lg);max-width:640px;margin:0 auto}
+    .teacher-bar{display:flex;align-items:center;gap:var(--space-md);width:100%;background:var(--bg-card);border:1px solid #2a2a2a;border-radius:var(--radius-md);padding:var(--space-sm) var(--space-md)}
+    .teacher-bar .character-portrait{width:52px;height:68px;font-size:0.7rem;border-color:var(--red)}
+    .teacher-name{font-weight:500;color:var(--red)}
+    .teacher-role{font-size:0.8rem;color:var(--text-muted)}
+    .dialogue-box{width:100%;background:var(--bg-card);border:1px solid #2a2a2a;border-radius:var(--radius-md);padding:var(--space-md) var(--space-lg);min-height:4.5em;line-height:1.6}
+    .dialogue-box.correct{border-color:var(--gold)}
+    .dialogue-box.wrong{border-color:var(--red)}
+    .step-indicator{font-size:0.85rem;color:var(--text-muted);text-align:center}
+    .lesson-controls{display:flex;gap:var(--space-sm);justify-content:center;flex-wrap:wrap}
+    .back-link{align-self:flex-start;margin-bottom:var(--space-md);font-size:0.9rem;color:var(--text-secondary)}
+    .hint{font-size:0.85rem;color:var(--text-muted);text-align:center}
+  </style>
 </head>
 <body>
-<div class="page"><div class="container">
-<a href="../lessons.html" class="back-link">← レッスン一覧に戻る</a>
-<div class="lesson-layout">
-<div class="teacher-bar">
-<div class="character-portrait" data-character="sakazuki"><span>サカ</span></div>
-<div><div class="teacher-name">サカズキ</div><div style="font-size:.8rem;color:var(--text-muted)">初級 ― 基礎</div></div>
-</div>
-<div class="dialogue-box" id="dialogue">読み込み中…</div>
-<div class="step-indicator" id="step-indicator">1 / 1</div>
-<div class="hint" id="hint"></div>
-<div class="board-wrapper"><div id="board"></div></div>
-<div class="lesson-controls">
-<button class="btn" id="btn-prev">前へ</button>
-<button class="btn btn-gold" id="btn-next">次へ</button>
-</div>
-</div></div></div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
-<script src="../js/chess-board.js"></script>
-<script src="../js/progress.js"></script>
-<script src="../js/lesson-extras.js"></script>
-<script>
-const lessonData={id:"01-basics",steps:[
-{type:"explain",fen:"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",text:"基礎から教える。チェスは白が先手じゃ。駒はそれぞれ動き方が違う。まずはポーンとナイトを覚えろ。"},
-{type:"explain",fen:"rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1",highlight:["e4"],text:"ポーンは前に1マス（最初だけ2マス）進む。斜め前に相手の駒があるときだけ取れる。"},
-{type:"practice",fen:"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",highlight:["e2"],text:"【問題1】白のeポーンを2マス進めろ（e4へ）。",correct:["e2e4"],correctText:"正解じゃ。中央を取る手だ。",wrongText:"e2のポーンをe4へ進めろ。"},
-{type:"explain",fen:"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",text:"ナイトはL字（2+1）に跳ぶ。他の駒を飛び越えられる。"},
-{type:"practice",fen:"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",highlight:["b1"],text:"【問題2】クイーン側のナイトをc3へ出せ。",correct:["b1c3"],correctText:"正解じゃ。ナイトは展開の基本だ。",wrongText:"b1のナイトをc3へ。"},
-{type:"explain",fen:"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",text:"チェックはキングが取られる状態。必ず解消しなければならん。逃げ道を塞げば詰みじゃ。"},
-{type:"practice",fen:"7k/8/6K1/8/8/8/8/7R w - - 0 1",highlight:["h1"],text:"【問題3】ルークで相手キングにチェックをかけろ。",correct:["h1h8","h1h7","h1h6","h1h5","h1h4","h1h3","h1h2"],correctText:"正解じゃ。同じ縦の筋に置けばチェックになる。",wrongText:"ルークをh列（キングと同じ縦）に動かせ。"},
-{type:"explain",fen:"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",text:"今日の要点は3つ。①中央を意識する ②ナイトはL字 ③チェックは必ず解消。対局で試してみろ。"}
-]};
-const dialogueEl=document.getElementById("dialogue");
-const stepEl=document.getElementById("step-indicator");
-const hintEl=document.getElementById("hint");
-const btnPrev=document.getElementById("btn-prev");
-const btnNext=document.getElementById("btn-next");
-let currentStep=0,practiceSolved=false;
-const board=window.__lessonBoard=new ChessBoardUI("board",{onMove:onBoardMove});
-function loadStep(index){
-currentStep=index;practiceSolved=false;
-const step=lessonData.steps[index];
-board.loadFen(step.fen);board.clearHighlights();
-if(step.highlight)step.highlight.forEach(sq=>{const el=board.container.querySelector(`[data-square="${sq}"]`);if(el)el.classList.add("highlight");});
-dialogueEl.textContent=step.text;dialogueEl.classList.remove("correct","wrong");
-stepEl.textContent=(index+1)+" / "+lessonData.steps.length;
-if(step.type==="practice"){hintEl.textContent="駒を動かして正解を探してください";btnNext.disabled=true;btnNext.textContent="正解を出してから次へ";}
-else{hintEl.textContent="";btnNext.disabled=false;btnNext.textContent=index>=lessonData.steps.length-1?"完了":"次へ";}
-btnPrev.disabled=index<=0;
-}
-function onBoardMove(move){
-const step=lessonData.steps[currentStep];
-if(step.type!=="practice"||practiceSolved)return;
-const uci=move.from+move.to+(move.promotion||"");
-if((step.correct||[]).includes(uci)||(step.correct||[]).includes(move.from+move.to)){
-practiceSolved=true;dialogueEl.textContent=step.correctText||"正解じゃ。";dialogueEl.classList.add("correct");
-hintEl.textContent="正解！次へ進めます";btnNext.disabled=false;btnNext.textContent=currentStep>=lessonData.steps.length-1?"完了":"次へ";
-}else{dialogueEl.textContent=step.wrongText||"違うぞ。もう一度考えてみろ。";dialogueEl.classList.add("wrong");hintEl.textContent="別の手を試してみてください";setTimeout(()=>board.undo(),600);}
-}
-btnPrev.addEventListener("click",()=>{if(currentStep>0){loadStep(currentStep-1);Progress.setLessonStep("01-basics",currentStep);}});
-btnNext.addEventListener("click",()=>{
-if(currentStep>=lessonData.steps.length-1){Progress.completeLesson("01-basics");alert("「基礎編」を終えました。");location.href="../lessons.html";return;}
-loadStep(currentStep+1);Progress.setLessonStep("01-basics",currentStep);
-});
-loadStep(0);
-</script>
+  <div class="page"><div class="container">
+    <a href="../lessons.html" class="back-link">← レッスン一覧に戻る</a>
+    <div class="lesson-layout">
+      <div class="teacher-bar">
+        <div class="character-portrait" data-character="sakazuki"><span>サカ</span></div>
+        <div><div class="teacher-name">サカズキ</div><div class="teacher-role">基礎担当</div></div>
+      </div>
+      <div class="dialogue-box" id="dialogue">読み込み中…</div>
+      <div class="step-indicator" id="step-indicator">1 / 1</div>
+      <div class="hint" id="hint"></div>
+      <div class="board-wrapper"><div id="board"></div></div>
+      <div class="lesson-controls">
+        <button class="btn" id="btn-prev">前へ</button>
+        <button class="btn btn-gold" id="btn-next">次へ</button>
+      </div>
+    </div>
+  </div></div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+  <script src="../js/chess-board.js"></script>
+  <script src="../js/lesson-extras.js"></script>
+  <script src="../js/progress.js"></script>
+  <script>
+    const lessonData = {
+      id: "01-basics",
+      steps: [
+        { type:"explain", fen:"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+          text:"わしが基礎を叩き込む。まずは盤面を見ろ。8×8の盤が戦場じゃ。端より中央の方が駒が動きやすく、重要度が高い。" },
+        { type:"explain", fen:"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", highlight:["e2","e4","d2","d4"],
+          text:"中央の4マス（d4,e4,d5,e5）を意識しろ。ここを抑えると駒が動きやすくなり、相手の動きを制限できる。初心者は端ばかり気にして中央を疎かにする傾向がある。" },
+        { type:"explain", fen:"8/8/8/8/8/8/4P3/8 w - - 0 1", highlight:["e2","e3","e4"],
+          text:"ポーンは真前に1マス（最初だけ2マス）。斜め前に敵がいれば取れる。後ろには下がれん。だから一度進めたら慎重にしろ。" },
+        { type:"practice", fen:"8/8/8/8/8/8/4P3/8 w - - 0 1", highlight:["e2"],
+          text:"【問題1】このポーンを、最初に許される2マス進める手を指せ。",
+          correct:["e2e4"],
+          correctText:"正解じゃ。e2からe4へ。中央を取る一手だ。",
+          wrongText:"e2のポーンをe4へ進めろ。最初だけ2マス進める。" },
+        { type:"explain", fen:"8/8/8/8/8/8/8/4N3 w - - 0 1", highlight:["e1"],
+          text:"ナイトはL字に跳ぶ。2マス進んで1マス横、または1マス進んで2マス横。他の駒を飛び越えられる唯一の駒じゃ。" },
+        { type:"explain", fen:"8/8/8/8/8/8/8/4N3 w - - 0 1", highlight:["e1","d3","f3","c2","g2"],
+          text:"e1のナイトが行けるマスは、d3・f3・c2・g2などじゃ。慣れるまで何度も動かせ。" },
+        { type:"explain", fen:"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", highlight:["b1","g1"],
+          text:"実戦では序盤にナイトを出す。b1のナイトはc3へ、g1のナイトはf3へ出すのが定跡に近い。" },
+        { type:"practice", fen:"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", highlight:["b1"],
+          text:"【問題2】クイーン側のナイト（b1）をc3へ展開しろ。",
+          correct:["b1c3"],
+          correctText:"正解じゃ。ナイトの展開は序盤の基本だ。",
+          wrongText:"b1のナイトをc3へ動かせ。" },
+        { type:"explain", fen:"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+          text:"チェックとは、キングが取られる状態のことじゃ。チェックをかけられた側は、必ず解消しなければならん。放置は反則だ。" },
+        { type:"explain", fen:"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+          text:"解消の方法は3つ。①キングを逃げる ②チェックをかけている駒を取る ③他の駒で間に入る（ブロック）。" },
+        { type:"explain", fen:"7k/8/6K1/8/8/8/8/7R w - - 0 1", highlight:["h1","h8"],
+          text:"この図では、白のルークがh列にいる。キングはh8だ。同じ縦筋にいればチェックになる。" },
+        { type:"explain", fen:"7k/8/6K1/8/8/8/8/7R w - - 0 1",
+          text:"チェックメイトは、チェックをかけつつ逃げ道も塞いだ状態じゃ。取っても逃げてもブロックもできない。" },
+        { type:"practice", fen:"7k/8/6K1/8/8/8/8/7R w - - 0 1", highlight:["h1"],
+          text:"【問題3】ルークを動かして、相手キングにチェックをかけろ。",
+          correct:["h1h8","h1h7","h1h6","h1h5","h1h4","h1h3","h1h2"],
+          correctText:"正解じゃ。同じ縦の筋に置けばチェックになる。",
+          wrongText:"ルークをh列（キングと同じ縦）に動かせ。" },
+        { type:"explain", fen:"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+          text:"今日の要点は3つ。①中央を意識する ②ナイトはL字で展開する ③チェックは必ず解消する。対局で試してみろ。" }
+      ]
+    };
+    const dialogueEl = document.getElementById("dialogue");
+    const stepEl = document.getElementById("step-indicator");
+    const hintEl = document.getElementById("hint");
+    const btnPrev = document.getElementById("btn-prev");
+    const btnNext = document.getElementById("btn-next");
+    let currentStep = 0, practiceSolved = false;
+    const board = window.__lessonBoard = new ChessBoardUI("board", { onMove: onBoardMove });
+    function loadStep(index) {
+      currentStep = index; practiceSolved = false;
+      const step = lessonData.steps[index];
+      board.loadFen(step.fen); board.clearHighlights();
+      if (step.highlight) step.highlight.forEach(sq => {
+        const el = board.container.querySelector(`[data-square="${sq}"]`);
+        if (el) el.classList.add("highlight");
+      });
+      dialogueEl.textContent = step.text;
+      dialogueEl.classList.remove("correct", "wrong");
+      stepEl.textContent = (index + 1) + " / " + lessonData.steps.length;
+      if (step.type === "practice") {
+        hintEl.textContent = "駒を動かして正解を探してください";
+        btnNext.disabled = true; btnNext.textContent = "正解を出してから次へ";
+      } else {
+        hintEl.textContent = "";
+        btnNext.disabled = false;
+        btnNext.textContent = index >= lessonData.steps.length - 1 ? "完了" : "次へ";
+      }
+      btnPrev.disabled = index <= 0;
+    }
+    function onBoardMove(move) {
+      const step = lessonData.steps[currentStep];
+      if (step.type !== "practice" || practiceSolved) return;
+      const uci = move.from + move.to + (move.promotion || "");
+      if ((step.correct || []).includes(uci) || (step.correct || []).includes(move.from + move.to)) {
+        practiceSolved = true;
+        dialogueEl.textContent = step.correctText || "正解じゃ。";
+        dialogueEl.classList.add("correct");
+        hintEl.textContent = "正解！次へ進めます";
+        btnNext.disabled = false;
+        btnNext.textContent = currentStep >= lessonData.steps.length - 1 ? "完了" : "次へ";
+      } else {
+        dialogueEl.textContent = step.wrongText || "違うぞ。もう一度考えてみろ。";
+        dialogueEl.classList.add("wrong");
+        hintEl.textContent = "別の手を試してみてください";
+        setTimeout(() => board.undo(), 600);
+      }
+    }
+    btnPrev.addEventListener("click", () => {
+      if (currentStep > 0) { loadStep(currentStep - 1); Progress.setLessonStep("01-basics", currentStep); }
+    });
+    btnNext.addEventListener("click", () => {
+      if (currentStep >= lessonData.steps.length - 1) {
+        Progress.completeLesson("01-basics");
+        alert("「基礎編」を終えました。");
+        location.href = "../lessons.html";
+        return;
+      }
+      loadStep(currentStep + 1);
+      Progress.setLessonStep("01-basics", currentStep);
+    });
+    loadStep(0);
+  </script>
 </body>
 </html>
