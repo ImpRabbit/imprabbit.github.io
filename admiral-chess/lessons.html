@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="theme-color" content="#0a0a0c"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<link rel="manifest" href="manifest.webmanifest"/>
+<link rel="apple-touch-icon" href="images/icon.svg"/>
+<title>レッスン一覧 | 三大将チェス</title>
+<link rel="stylesheet" href="css/style.css"/>
+<style>
+.page-header{margin-bottom:var(--space-xl)}
+.page-header h1{font-size:1.5rem;font-weight:500;margin-bottom:var(--space-xs)}
+.page-header p{color:var(--text-secondary);font-size:.95rem}
+.section-title{font-size:1.05rem;font-weight:500;margin:var(--space-xl) 0 var(--space-md);border-left:3px solid var(--gold);padding-left:10px}
+.section-title.intermediate{border-left-color:var(--blue)}
+.lesson-list{display:flex;flex-direction:column;gap:var(--space-md)}
+.lesson-item{display:flex;align-items:center;gap:var(--space-md);padding:var(--space-md) var(--space-lg);background:var(--bg-card);border:1px solid #2a2a2a;border-radius:var(--radius-md);text-decoration:none;color:inherit}
+.lesson-number{font-size:.85rem;color:var(--text-muted);min-width:2.5rem}
+.lesson-title{font-weight:500;margin-bottom:2px}
+.lesson-desc{font-size:.85rem;color:var(--text-secondary)}
+.lesson-teacher{font-size:.8rem;color:var(--text-muted)}
+.back-link{display:inline-block;margin-bottom:var(--space-lg);font-size:.9rem;color:var(--text-secondary)}
+</style>
+</head>
+<body>
+<div class="page"><div class="container">
+<a href="index.html" class="back-link">← ホームに戻る</a>
+<header class="page-header">
+<h1>レッスン一覧</h1>
+<p>初級を一通り終えてから中級へ進むことをおすすめします</p>
+<p style="color:var(--text-muted);font-size:.85rem;margin-top:8px">学んだことは<a href="play.html" style="color:var(--gold)">三大将との対局</a>で試せます</p>
+</header>
+<div class="section-title">初級</div>
+<div class="lesson-list" id="beginner"></div>
+<div class="section-title intermediate">中級</div>
+<div class="lesson-list" id="intermediate"></div>
+</div></div>
+<script src="js/progress.js"></script>
+<script>
+const beginner=[
+["01","01-basics.html","基礎編 ― 駒の動きとチェック","駒の動き・中央・チェック","サカズキ","accent-red","01-basics"],
+["02","02-tactics-intro.html","戦術入門 ― フォークとピン","得する手とその理由","クザン","accent-blue","02-tactics"],
+["03","03-checkmate-basics.html","実践基礎 ― 詰み入門","詰みの基本形","サカズキ","accent-red","03-practice"],
+["04","04-opening.html","オープニング入門","中央支配・展開・キングの安全","クザン","accent-blue","04-opening"],
+["05","05-endgame.html","終盤基礎","キング活用とポーンの成り","クザン","accent-blue","05-endgame"],
+["06","06-summary.html","総合練習","まとめと実戦への橋渡し","ボルサリーノ","accent-gold","06-advanced"]
+];
+const intermediate=[
+["07","07-beginner-mistakes.html","典型的な初心者の失敗","クイーン早出しなど","クザン","accent-blue","07-mistakes"],
+["08","08-tactics-advanced.html","戦術の応用","発見攻撃・スキュワー","クザン","accent-blue","08-tactics-adv"],
+["09","09-endgame-practical.html","終盤の勝ち切り","焦らず勝つ","クザン","accent-blue","09-endgame-prac"],
+["10","10-mate-patterns.html","よくある詰みパターン","バックランクなど","サカズキ","accent-red","10-mate-patterns"],
+["11","11-middlegame.html","中盤の考え方入門","脅威・改善・相手の計画","クザン","accent-blue","11-middlegame"],
+["12","12-pawn-structure.html","ポーンの構造","前進・穴・孤立","クザン","accent-blue","12-pawn-structure"]
+];
+function render(list,elId){
+const el=document.getElementById(elId);
+list.forEach(([num,href,title,desc,teacher,cls,key])=>{
+const done=Progress.isLessonCompleted(key);
+const t=(done?"\u2713 ":"")+title;
+const a=document.createElement("a");
+a.href="lessons/"+href;a.className="lesson-item";
+a.innerHTML="<div class=\"lesson-number\">"+num+"</div><div class=\"lesson-info\"><div class=\"lesson-title\" style=\""+(done?"color:var(--gold)":"")+"\">"+t+"</div><div class=\"lesson-desc\">"+desc+"</div><div class=\"lesson-teacher "+cls+"\">担当："+teacher+"</div></div>";
+el.appendChild(a);
+});
+}
+render(beginner,"beginner");
+render(intermediate,"intermediate");
+</script>
+</body>
+</html>
