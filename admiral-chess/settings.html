@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0a0a0c" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="三大将チェス" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="images/icon.svg" />
+  <title>設定 | 三大将チェス</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    .page-header { margin-bottom: var(--space-xl); }
+    .page-header h1 { font-size: 1.5rem; font-weight: 500; margin-bottom: var(--space-xs); }
+    .page-header p { color: var(--text-secondary); font-size: 0.95rem; }
+    .setting-item { display: flex; justify-content: space-between; align-items: center; padding: var(--space-md) 0; border-bottom: 1px solid #2a2a2a; }
+    .setting-label { font-size: 0.95rem; }
+    .setting-desc { font-size: 0.8rem; color: var(--text-muted); margin-top: 2px; }
+    .back-link { display: inline-block; margin-bottom: var(--space-lg); font-size: 0.9rem; color: var(--text-secondary); }
+    .stats { background: var(--bg-card); border: 1px solid #2a2a2a; border-radius: var(--radius-md); padding: var(--space-md); margin-bottom: var(--space-xl); font-size: 0.9rem; color: var(--text-secondary); }
+  </style>
+</head>
+<body>
+  <div class="page"><div class="container">
+    <a href="index.html" class="back-link">← ホームに戻る</a>
+    <header class="page-header"><h1>設定</h1><p>個人用の簡単な設定です</p></header>
+    <div class="stats" id="stats">読み込み中…</div>
+    <div class="setting-item">
+      <div><div class="setting-label">進捗のリセット</div><div class="setting-desc">レッスンの完了状態と対局記録をすべて消します</div></div>
+      <button class="btn btn-red" id="btn-reset">リセット</button>
+    </div>
+    <div class="setting-item" style="flex-direction:column;align-items:flex-start;gap:8px;">
+      <div class="setting-label">iPhoneのホーム画面に追加</div>
+      <div class="setting-desc">Safariで開く → 共有ボタン →「ホーム画面に追加」</div>
+    </div>
+    <p style="margin-top:32px;font-size:0.8rem;color:var(--text-muted);">※データはこの端末のブラウザ内にのみ保存されています。</p>
+  </div></div>
+  <script src="js/progress.js"></script>
+  <script>
+    function renderStats() {
+      const data = Progress.load();
+      const completed = Object.values(data.lessons).filter(l => l.completed).length;
+      const total = Object.keys(data.lessons).length;
+      const g = data.games;
+      document.getElementById("stats").innerHTML = "レッスン進捗：" + completed + " / " + total + "<br>対局数：" + g.played + "（勝ち " + g.wins + " / 負け " + g.losses + " / 引き分け " + g.draws + "）";
+    }
+    document.getElementById("btn-reset").addEventListener("click", () => {
+      if (confirm("本当に進捗をすべてリセットしますか？")) {
+        localStorage.removeItem(Progress.KEY);
+        renderStats();
+        alert("リセットしました。");
+      }
+    });
+    renderStats();
+  </script>
+</body>
+</html>
