@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0a0a0c" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="三大将チェス" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="images/icon.svg" />
+  <link rel="icon" href="images/icon.svg" />
+  <title>三大将チェス</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    .hero { text-align: center; padding: var(--space-2xl) 0 var(--space-xl); }
+    .hero h1 { font-size: 1.9rem; font-weight: 500; letter-spacing: 0.08em; margin-bottom: var(--space-sm); }
+    .hero .tagline { color: var(--text-secondary); font-size: 0.95rem; margin-bottom: var(--space-2xl); }
+    .admirals { display: flex; justify-content: center; gap: var(--space-lg); flex-wrap: wrap; margin-bottom: var(--space-2xl); }
+    .admiral-card { width: 150px; text-align: center; }
+    .admiral-card .character-portrait { width: 140px; height: 180px; margin: 0 auto var(--space-sm); border-width: 1px; }
+    .admiral-card.sakazuki .character-portrait { border-color: var(--red); }
+    .admiral-card.kuzan .character-portrait { border-color: var(--blue); }
+    .admiral-card.borsalino .character-portrait { border-color: var(--gold); }
+    .admiral-name { font-size: 0.95rem; font-weight: 500; margin-bottom: 2px; }
+    .admiral-role { font-size: 0.8rem; color: var(--text-muted); }
+    .main-actions { display: flex; flex-direction: column; align-items: center; gap: var(--space-md); margin-top: var(--space-xl); }
+    .main-actions .btn { min-width: 220px; }
+    .footer-note { margin-top: var(--space-2xl); text-align: center; font-size: 0.8rem; color: var(--text-muted); }
+  </style>
+</head>
+<body>
+  <div class="page"><div class="container">
+    <header class="hero">
+      <h1>三大将チェス</h1>
+      <p class="tagline">サカズキ・クザン・ボルサリーノに教わりながら、チェスを身につける</p>
+    </header>
+    <section class="admirals">
+      <div class="admiral-card sakazuki"><div class="character-portrait" data-character="sakazuki"><span>サカズキ</span></div><div class="admiral-name accent-red">サカズキ</div><div class="admiral-role">基礎・厳格な指導</div></div>
+      <div class="admiral-card kuzan"><div class="character-portrait" data-character="kuzan"><span>クザン</span></div><div class="admiral-name accent-blue">クザン</div><div class="admiral-role">戦術・考え方</div></div>
+      <div class="admiral-card borsalino"><div class="character-portrait" data-character="borsalino"><span>ボルサリーノ</span></div><div class="admiral-name accent-gold">ボルサリーノ</div><div class="admiral-role">実践・対局</div></div>
+    </section>
+    <section class="main-actions">
+      <p style="color:var(--text-secondary);font-size:0.9rem;margin-bottom:16px;max-width:360px;">レッスンで学んだことを、三大将との対局で試す。<br>負けても、対局後に次に見るレッスンが示されます。</p>
+      <a href="lessons.html" class="btn btn-gold">レッスンを始める</a>
+      <a href="play.html" class="btn">対局する</a>
+      <a href="settings.html" class="btn">設定・進捗</a>
+    </section>
+    <p class="footer-note">完全個人利用のための学習サイトです</p>
+  </div></div>
+  <script src="js/progress.js"></script>
+  <script>
+    const data = Progress.load();
+    const completed = Object.values(data.lessons).filter(l => l.completed).length;
+    const total = Object.keys(data.lessons).length;
+    const games = data.games.played || 0;
+    const tagline = document.querySelector(".tagline");
+    if (tagline) {
+      const status = document.createElement("p");
+      status.style.cssText = "color: var(--text-muted); font-size: 0.85rem; margin-top: 12px;";
+      status.textContent = "レッスン進捗 " + completed + "/" + total + " ｜ 対局数 " + games;
+      tagline.after(status);
+    }
+  </script>
+  <script>if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navigator.serviceWorker.register("./sw.js").catch(() => {}); }); }</script>
+</body>
+</html>
