@@ -1,8 +1,84 @@
-<!DOCTYPE html><html lang="ja"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><link rel="stylesheet" href="../css/style.css"/><title>初心者の失敗</title><style>.lesson-layout{display:flex;flex-direction:column;align-items:center;gap:var(--space-lg);max-width:640px;margin:0 auto}.teacher-bar{display:flex;align-items:center;gap:var(--space-md);width:100%;background:var(--bg-card);border:1px solid #2a2a2a;border-radius:var(--radius-md);padding:8px 16px}.dialogue-box{width:100%;background:var(--bg-card);border:1px solid #2a2a2a;border-radius:8px;padding:16px;min-height:4em}.dialogue-box.correct{border-color:var(--gold)}.dialogue-box.wrong{border-color:var(--red)}.lesson-controls{display:flex;gap:8px;justify-content:center}.back-link{align-self:flex-start;color:var(--text-secondary);font-size:.9rem}</style></head><body><div class="page"><div class="container"><a href="../lessons.html" class="back-link">← レッスン一覧</a><div class="lesson-layout"><div class="teacher-bar"><div class="character-portrait" data-character="kuzan" style="width:52px;height:68px;border-color:var(--blue)"><span>クザ</span></div><div><div style="color:var(--blue);font-weight:500">クザン</div><div style="font-size:.8rem;color:var(--text-muted)">中級 ― 失敗例</div></div></div><div class="dialogue-box" id="dialogue">...</div><div id="step-indicator" style="color:var(--text-muted);font-size:.85rem">1/1</div><div class="board-wrapper"><div id="board"></div></div><div class="lesson-controls"><button class="btn" id="btn-prev">前へ</button><button class="btn btn-gold" id="btn-next">次へ</button></div></div></div></div><script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script><script src="../js/chess-board.js"></script><script src="../js/progress.js"></script><script src="../js/lesson-extras.js"></script><script>
-const lessonData={id:"07-mistakes",steps:[{type:"explain",fen:"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",text:"クイーンの早出し、同じ駒ばかり動かす、キングの安全を忘れる——よくある失敗だ。"},{type:"practice",fen:"rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq e6 0 2",highlight:["g1","b1"],text:"【問題】まだ出ていない駒を展開しろ。",correct:["g1f3","b1c3"],correctText:"正解だ。",wrongText:"ナイトをf3かc3へ。"},{type:"explain",fen:"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",text:"むやみにポーンを突くと穴ができる。突く前に理由を持て。"}]};
-const dialogueEl=document.getElementById("dialogue"),stepEl=document.getElementById("step-indicator"),btnPrev=document.getElementById("btn-prev"),btnNext=document.getElementById("btn-next");let currentStep=0,practiceSolved=false;const board=window.__lessonBoard=new ChessBoardUI("board",{onMove:onBoardMove});
-function loadStep(i){currentStep=i;practiceSolved=false;const s=lessonData.steps[i];board.loadFen(s.fen);board.clearHighlights();if(s.highlight)s.highlight.forEach(sq=>{const el=board.container.querySelector(`[data-square="${sq}"]`);if(el)el.classList.add("highlight");});dialogueEl.textContent=s.text;dialogueEl.classList.remove("correct","wrong");stepEl.textContent=(i+1)+" / "+lessonData.steps.length;if(s.type==="practice"){btnNext.disabled=true;btnNext.textContent="正解後に次へ";}else{btnNext.disabled=false;btnNext.textContent=i>=lessonData.steps.length-1?"完了":"次へ";}btnPrev.disabled=i<=0;}
-function onBoardMove(move){const s=lessonData.steps[currentStep];if(s.type!=="practice"||practiceSolved)return;const uci=move.from+move.to;if((s.correct||[]).includes(uci)){practiceSolved=true;dialogueEl.textContent=s.correctText;dialogueEl.classList.add("correct");btnNext.disabled=false;btnNext.textContent=currentStep>=lessonData.steps.length-1?"完了":"次へ";}else{dialogueEl.textContent=s.wrongText;dialogueEl.classList.add("wrong");setTimeout(()=>board.undo(),600);}}
+<!DOCTYPE html>
+<html lang="ja"><head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="theme-color" content="#0a0a0c"/>
+<link rel="manifest" href="../manifest.webmanifest"/>
+<link rel="apple-touch-icon" href="../images/icon.svg"/>
+<title>初心者の失敗 | 三大将チェス</title>
+<link rel="stylesheet" href="../css/style.css"/>
+<style>
+.lesson-layout{display:flex;flex-direction:column;align-items:center;gap:var(--space-lg);max-width:640px;margin:0 auto}
+.teacher-bar{display:flex;align-items:center;gap:var(--space-md);width:100%;background:var(--bg-card);border:1px solid #2a2a2a;border-radius:var(--radius-md);padding:var(--space-sm) var(--space-md)}
+.teacher-bar .character-portrait{width:52px;height:68px;font-size:.7rem;border-color:var(--blue)}
+.teacher-name{font-weight:500;color:var(--blue)}
+.dialogue-box{width:100%;background:var(--bg-card);border:1px solid #2a2a2a;border-radius:var(--radius-md);padding:var(--space-md) var(--space-lg);min-height:4.5em;line-height:1.6}
+.dialogue-box.correct{border-color:var(--gold)}.dialogue-box.wrong{border-color:var(--red)}
+.step-indicator{font-size:.85rem;color:var(--text-muted);text-align:center}
+.lesson-controls{display:flex;gap:var(--space-sm);justify-content:center}
+.back-link{align-self:flex-start;margin-bottom:var(--space-md);font-size:.9rem;color:var(--text-secondary)}
+.hint{font-size:.85rem;color:var(--text-muted);text-align:center}
+</style></head>
+<body><div class="page"><div class="container">
+<a href="../lessons.html" class="back-link">← レッスン一覧に戻る</a>
+<div class="lesson-layout">
+<div class="teacher-bar"><div class="character-portrait" data-character="kuzan"><span>クザ</span></div>
+<div><div class="teacher-name">クザン</div><div style="font-size:.8rem;color:var(--text-muted)">中級・失敗例</div></div></div>
+<div class="dialogue-box" id="dialogue">読み込み中…</div>
+<div class="step-indicator" id="step-indicator">1 / 1</div>
+<div class="hint" id="hint"></div>
+<div class="board-wrapper"><div id="board"></div></div>
+<div class="lesson-controls"><button class="btn" id="btn-prev">前へ</button><button class="btn btn-gold" id="btn-next">次へ</button></div>
+</div></div></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+<script src="../js/chess-board.js"></script>
+<script src="../js/lesson-extras.js"></script>
+<script src="../js/progress.js"></script>
+<script>
+const lessonData = {
+  id: "07-mistakes",
+  steps: [
+    { type:"explain", fen:"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+      text:"中級だな。まずは初心者がやりがちな失敗を潰す。知っておけば、対局で同じ穴に落ちにくくなる。" },
+    { type:"explain", fen:"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+      text:"一番多いのがクイーンの早出しだ。序盤にクイーンを何度も動かされると、相手に手得を取られ、展開が遅れる。" },
+    { type:"explain", fen:"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+      text:"同じ駒ばかり動かすのもよくない。まだ出ていないナイトやビショップを優先して出せ。" },
+    { type:"explain", fen:"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+      text:"キングの安全を忘れるな。中央にキングを残したまま戦うと、チェックやフォークの的になる。" },
+    { type:"explain", fen:"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+      text:"むやみにポーンを突くと『穴』ができる。一度進めたポーンは戻れない。突く前に理由を持て。" },
+    { type:"explain", fen:"rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq e6 0 2", highlight:["g1","b1"],
+      text:"この局面では、まだナイトが出ていない。g1→f3、b1→c3が自然な展開だ。" },
+    { type:"practice", fen:"rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq e6 0 2", highlight:["g1","b1"],
+      text:"【問題1】まだ出ていない駒を展開しろ。",
+      correct:["g1f3","b1c3"],
+      correctText:"正解だ。遊んでいる駒を出せ。",
+      wrongText:"ナイトをf3かc3へ。" },
+    { type:"explain", fen:"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+      text:"相手の脅威を無視するのも失敗だ。自分のやりたい手の前に、『相手に何を狙われているか』を一手ごとに見ろ。" },
+    { type:"practice", fen:"rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq e6 0 2", highlight:["g1"],
+      text:"【問題2】キング側のナイトを展開しろ（f3へ）。",
+      correct:["g1f3"],
+      correctText:"正解だ。",
+      wrongText:"g1のナイトをf3へ。" },
+    { type:"practice", fen:"rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2", highlight:["b1"],
+      text:"【問題3】もう一方のナイトも出せ（c3へ）。白番として考えて。",
+      correct:["b1c3"],
+      correctText:"正解だ。両ナイトが出れば展開は順調だ。",
+      wrongText:"b1のナイトをc3へ。" },
+    { type:"explain", fen:"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+      text:"失敗を避けるチェックリスト：①クイーン早出ししていないか ②遊んでいる駒はないか ③キングは安全か ④ポーンに理由はあるか。" },
+    { type:"explain", fen:"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+      text:"対局で負けたあとに、このリストで振り返ると伸びが早い。次は戦術の応用だ。" },
+    { type:"explain", fen:"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+      text:"要点：早出しを避け、全駒を展開し、キングを守り、ポーンは慎重に。これだけで勝率が上がる。" }
+  ]
+};
+const dialogueEl=document.getElementById("dialogue"),stepEl=document.getElementById("step-indicator"),hintEl=document.getElementById("hint"),btnPrev=document.getElementById("btn-prev"),btnNext=document.getElementById("btn-next");
+let currentStep=0,practiceSolved=false;
+const board=window.__lessonBoard=new ChessBoardUI("board",{onMove:onBoardMove});
+function loadStep(i){currentStep=i;practiceSolved=false;const s=lessonData.steps[i];board.loadFen(s.fen);board.clearHighlights();if(s.highlight)s.highlight.forEach(sq=>{const el=board.container.querySelector(`[data-square="${sq}"]`);if(el)el.classList.add("highlight");});dialogueEl.textContent=s.text;dialogueEl.classList.remove("correct","wrong");stepEl.textContent=(i+1)+" / "+lessonData.steps.length;if(s.type==="practice"){hintEl.textContent="駒を動かして正解を";btnNext.disabled=true;btnNext.textContent="正解後に次へ";}else{hintEl.textContent="";btnNext.disabled=false;btnNext.textContent=i>=lessonData.steps.length-1?"完了":"次へ";}btnPrev.disabled=i<=0;}
+function onBoardMove(move){const s=lessonData.steps[currentStep];if(s.type!=="practice"||practiceSolved)return;const uci=move.from+move.to+(move.promotion||"");if((s.correct||[]).includes(uci)||(s.correct||[]).includes(move.from+move.to)){practiceSolved=true;dialogueEl.textContent=s.correctText||"正解だ。";dialogueEl.classList.add("correct");btnNext.disabled=false;btnNext.textContent=currentStep>=lessonData.steps.length-1?"完了":"次へ";}else{dialogueEl.textContent=s.wrongText||"違うぞ。";dialogueEl.classList.add("wrong");setTimeout(()=>board.undo(),600);}}
 btnPrev.onclick=()=>{if(currentStep>0){loadStep(currentStep-1);Progress.setLessonStep("07-mistakes",currentStep);}};
 btnNext.onclick=()=>{if(currentStep>=lessonData.steps.length-1){Progress.completeLesson("07-mistakes");alert("「典型的な初心者の失敗」を終えました。");location.href="../lessons.html";return;}loadStep(currentStep+1);Progress.setLessonStep("07-mistakes",currentStep);};
 loadStep(0);

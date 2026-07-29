@@ -1,8 +1,87 @@
-<!DOCTYPE html><html lang="ja"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><link rel="stylesheet" href="../css/style.css"/><title>戦術の応用</title><style>.lesson-layout{display:flex;flex-direction:column;align-items:center;gap:var(--space-lg);max-width:640px;margin:0 auto}.teacher-bar{display:flex;align-items:center;gap:var(--space-md);width:100%;background:var(--bg-card);border:1px solid #2a2a2a;border-radius:var(--radius-md);padding:8px 16px}.dialogue-box{width:100%;background:var(--bg-card);border:1px solid #2a2a2a;border-radius:8px;padding:16px;min-height:4em}.dialogue-box.correct{border-color:var(--gold)}.dialogue-box.wrong{border-color:var(--red)}.lesson-controls{display:flex;gap:8px;justify-content:center}.back-link{align-self:flex-start;color:var(--text-secondary);font-size:.9rem}</style></head><body><div class="page"><div class="container"><a href="../lessons.html" class="back-link">← レッスン一覧</a><div class="lesson-layout"><div class="teacher-bar"><div class="character-portrait" data-character="kuzan" style="width:52px;height:68px;border-color:var(--blue)"><span>クザ</span></div><div><div style="color:var(--blue);font-weight:500">クザン</div><div style="font-size:.8rem;color:var(--text-muted)">中級 ― 戦術</div></div></div><div class="dialogue-box" id="dialogue">...</div><div id="step-indicator" style="color:var(--text-muted);font-size:.85rem">1/1</div><div class="board-wrapper"><div id="board"></div></div><div class="lesson-controls"><button class="btn" id="btn-prev">前へ</button><button class="btn btn-gold" id="btn-next">次へ</button></div></div></div></div><script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script><script src="../js/chess-board.js"></script><script src="../js/progress.js"></script><script src="../js/lesson-extras.js"></script><script>
-const lessonData={id:"08-tactics-adv",steps:[{type:"explain",fen:"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",text:"発見攻撃やスキュワーなど、形を見る感覚が大事だ。"},{type:"practice",fen:"4k3/8/8/3q4/8/8/3R4/4K3 w - - 0 1",highlight:["d2"],text:"【問題】ルークでクイーンを取れ。",correct:["d2d5"],correctText:"正解だ。",wrongText:"d5へ。"},{type:"practice",fen:"8/8/8/3q1k2/2N5/8/8/K7 w - - 0 1",highlight:["c4"],text:"【問題】フォークのマスへ。",correct:["c4e3"],correctText:"正解だ。",wrongText:"e3へ。"}]};
-const dialogueEl=document.getElementById("dialogue"),stepEl=document.getElementById("step-indicator"),btnPrev=document.getElementById("btn-prev"),btnNext=document.getElementById("btn-next");let currentStep=0,practiceSolved=false;const board=window.__lessonBoard=new ChessBoardUI("board",{onMove:onBoardMove});
-function loadStep(i){currentStep=i;practiceSolved=false;const s=lessonData.steps[i];board.loadFen(s.fen);board.clearHighlights();if(s.highlight)s.highlight.forEach(sq=>{const el=board.container.querySelector(`[data-square="${sq}"]`);if(el)el.classList.add("highlight");});dialogueEl.textContent=s.text;dialogueEl.classList.remove("correct","wrong");stepEl.textContent=(i+1)+" / "+lessonData.steps.length;if(s.type==="practice"){btnNext.disabled=true;btnNext.textContent="正解後に次へ";}else{btnNext.disabled=false;btnNext.textContent=i>=lessonData.steps.length-1?"完了":"次へ";}btnPrev.disabled=i<=0;}
-function onBoardMove(move){const s=lessonData.steps[currentStep];if(s.type!=="practice"||practiceSolved)return;const uci=move.from+move.to;if((s.correct||[]).includes(uci)){practiceSolved=true;dialogueEl.textContent=s.correctText;dialogueEl.classList.add("correct");btnNext.disabled=false;btnNext.textContent=currentStep>=lessonData.steps.length-1?"完了":"次へ";}else{dialogueEl.textContent=s.wrongText;dialogueEl.classList.add("wrong");setTimeout(()=>board.undo(),600);}}
+<!DOCTYPE html>
+<html lang="ja"><head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="theme-color" content="#0a0a0c"/>
+<link rel="manifest" href="../manifest.webmanifest"/>
+<link rel="apple-touch-icon" href="../images/icon.svg"/>
+<title>戦術の応用 | 三大将チェス</title>
+<link rel="stylesheet" href="../css/style.css"/>
+<style>
+.lesson-layout{display:flex;flex-direction:column;align-items:center;gap:var(--space-lg);max-width:640px;margin:0 auto}
+.teacher-bar{display:flex;align-items:center;gap:var(--space-md);width:100%;background:var(--bg-card);border:1px solid #2a2a2a;border-radius:var(--radius-md);padding:var(--space-sm) var(--space-md)}
+.teacher-bar .character-portrait{width:52px;height:68px;font-size:.7rem;border-color:var(--blue)}
+.teacher-name{font-weight:500;color:var(--blue)}
+.dialogue-box{width:100%;background:var(--bg-card);border:1px solid #2a2a2a;border-radius:var(--radius-md);padding:var(--space-md) var(--space-lg);min-height:4.5em;line-height:1.6}
+.dialogue-box.correct{border-color:var(--gold)}.dialogue-box.wrong{border-color:var(--red)}
+.step-indicator{font-size:.85rem;color:var(--text-muted);text-align:center}
+.lesson-controls{display:flex;gap:var(--space-sm);justify-content:center}
+.back-link{align-self:flex-start;margin-bottom:var(--space-md);font-size:.9rem;color:var(--text-secondary)}
+.hint{font-size:.85rem;color:var(--text-muted);text-align:center}
+</style></head>
+<body><div class="page"><div class="container">
+<a href="../lessons.html" class="back-link">← レッスン一覧に戻る</a>
+<div class="lesson-layout">
+<div class="teacher-bar"><div class="character-portrait" data-character="kuzan"><span>クザ</span></div>
+<div><div class="teacher-name">クザン</div><div style="font-size:.8rem;color:var(--text-muted)">中級・戦術</div></div></div>
+<div class="dialogue-box" id="dialogue">読み込み中…</div>
+<div class="step-indicator" id="step-indicator">1 / 1</div>
+<div class="hint" id="hint"></div>
+<div class="board-wrapper"><div id="board"></div></div>
+<div class="lesson-controls"><button class="btn" id="btn-prev">前へ</button><button class="btn btn-gold" id="btn-next">次へ</button></div>
+</div></div></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+<script src="../js/chess-board.js"></script>
+<script src="../js/lesson-extras.js"></script>
+<script src="../js/progress.js"></script>
+<script>
+const lessonData = {
+  id: "08-tactics-adv",
+  steps: [
+    { type:"explain", fen:"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+      text:"戦術の応用だ。フォークの次は、発見攻撃とスキュワー（串刺し）を見る。形を見る感覚が大事だ。" },
+    { type:"explain", fen:"4k3/8/8/3q4/8/8/3R4/4K3 w - - 0 1", highlight:["d2","d5"],
+      text:"同じ筋（縦）にルークと敵のクイーンがいる。ルークを動かせばクイーンを狙える。線上の弱い駒を突くのが基本だ。" },
+    { type:"explain", fen:"4k3/8/8/3q4/8/8/3R4/4K3 w - - 0 1",
+      text:"スキュワーは、手前の駒を動かすと奥の重い駒が取られる形。ピンに似ているが、『奥を狙って手前を動かす』方向が違う。" },
+    { type:"explain", fen:"8/8/8/3q1k2/2N5/8/8/K7 w - - 0 1", highlight:["c4"],
+      text:"フォークの復習も兼ねて。ナイトが複数の駒に同時に利くマスを探す癖をつけろ。" },
+    { type:"practice", fen:"4k3/8/8/3q4/8/8/3R4/4K3 w - - 0 1", highlight:["d2"],
+      text:"【問題1】ルークでクイーンを取れ（同じ筋）。",
+      correct:["d2d5"],
+      correctText:"正解だ。線上の弱い駒を突く。",
+      wrongText:"ルークをd5へ（クイーンを取る）。" },
+    { type:"practice", fen:"8/8/8/3q1k2/2N5/8/8/K7 w - - 0 1", highlight:["c4"],
+      text:"【問題2】フォークになるマスへナイトを。",
+      correct:["c4e3"],
+      correctText:"正解だ。",
+      wrongText:"e3へ。" },
+    { type:"explain", fen:"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+      text:"発見攻撃は、動いた駒の後ろから別の駒が攻撃を始める手だ。ビショップやルークの前の駒が動くと、奥の攻撃が『発見』される。" },
+    { type:"practice", fen:"7k/8/6K1/8/8/8/8/7R w - - 0 1", highlight:["h1"],
+      text:"【問題3】ルークでチェックをかけろ。",
+      correct:["h1h8","h1h7","h1h6","h1h5","h1h4","h1h3","h1h2"],
+      correctText:"正解だ。",
+      wrongText:"h列にルークを。" },
+    { type:"practice", fen:"6k1/5ppp/8/8/8/8/8/1R4K1 w - - 0 1", highlight:["b1"],
+      text:"【問題4】バックランクにルークを送り込んで詰みを。",
+      correct:["b1b8"],
+      correctText:"正解だ。最終段の弱点を突く。",
+      wrongText:"b8へ。" },
+    { type:"explain", fen:"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+      text:"対局中は『相手のキングと重い駒が同じ線にいないか』『ナイトが両取りできるマスはないか』を疑え。" },
+    { type:"explain", fen:"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+      text:"戦術はパターンの蓄積だ。問題を繰り返すほど、実戦で『見たことがある形』が増える。" },
+    { type:"explain", fen:"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+      text:"次は終盤の勝ち切りだ。戦術で得をしたあと、きちんと勝ち切る力も必要になる。" },
+    { type:"explain", fen:"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+      text:"要点：線を見る、両取りを探す、最終段の弱点を忘れない。" }
+  ]
+};
+const dialogueEl=document.getElementById("dialogue"),stepEl=document.getElementById("step-indicator"),hintEl=document.getElementById("hint"),btnPrev=document.getElementById("btn-prev"),btnNext=document.getElementById("btn-next");
+let currentStep=0,practiceSolved=false;
+const board=window.__lessonBoard=new ChessBoardUI("board",{onMove:onBoardMove});
+function loadStep(i){currentStep=i;practiceSolved=false;const s=lessonData.steps[i];board.loadFen(s.fen);board.clearHighlights();if(s.highlight)s.highlight.forEach(sq=>{const el=board.container.querySelector(`[data-square="${sq}"]`);if(el)el.classList.add("highlight");});dialogueEl.textContent=s.text;dialogueEl.classList.remove("correct","wrong");stepEl.textContent=(i+1)+" / "+lessonData.steps.length;if(s.type==="practice"){hintEl.textContent="駒を動かして正解を";btnNext.disabled=true;btnNext.textContent="正解後に次へ";}else{hintEl.textContent="";btnNext.disabled=false;btnNext.textContent=i>=lessonData.steps.length-1?"完了":"次へ";}btnPrev.disabled=i<=0;}
+function onBoardMove(move){const s=lessonData.steps[currentStep];if(s.type!=="practice"||practiceSolved)return;const uci=move.from+move.to+(move.promotion||"");if((s.correct||[]).includes(uci)||(s.correct||[]).includes(move.from+move.to)){practiceSolved=true;dialogueEl.textContent=s.correctText||"正解だ。";dialogueEl.classList.add("correct");btnNext.disabled=false;btnNext.textContent=currentStep>=lessonData.steps.length-1?"完了":"次へ";}else{dialogueEl.textContent=s.wrongText||"違うぞ。";dialogueEl.classList.add("wrong");setTimeout(()=>board.undo(),600);}}
 btnPrev.onclick=()=>{if(currentStep>0){loadStep(currentStep-1);Progress.setLessonStep("08-tactics-adv",currentStep);}};
 btnNext.onclick=()=>{if(currentStep>=lessonData.steps.length-1){Progress.completeLesson("08-tactics-adv");alert("「戦術の応用」を終えました。");location.href="../lessons.html";return;}loadStep(currentStep+1);Progress.setLessonStep("08-tactics-adv",currentStep);};
 loadStep(0);
