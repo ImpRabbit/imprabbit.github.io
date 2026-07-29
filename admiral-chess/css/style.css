@@ -1,0 +1,67 @@
+/* 三大将チェス */
+:root {
+  --bg-main: #0d0d0d;
+  --bg-card: #161616;
+  --bg-elevated: #1f1f1f;
+  --bg-hover: #2a2a2a;
+  --text-primary: #f0f0f0;
+  --text-secondary: #a0a0a0;
+  --text-muted: #666666;
+  --gold: #c9a227;
+  --gold-light: #e0c35c;
+  --red: #b33a3a;
+  --red-light: #d45050;
+  --blue: #3a6ea5;
+  --blue-light: #5a8ec5;
+  --board-light: #c9a22722;
+  --board-dark: #1a1a1a;
+  --board-border: #333333;
+  --highlight: #c9a22755;
+  --last-move: #3a6ea555;
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --font-main: "Segoe UI", "Hiragino Sans", "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; height: 100%; }
+body { font-family: var(--font-main); background-color: var(--bg-main); color: var(--text-primary); line-height: 1.6; min-height: 100%; -webkit-font-smoothing: antialiased; }
+h1,h2,h3,h4 { font-weight: 600; letter-spacing: 0.02em; }
+h1 { font-size: 1.75rem; } h2 { font-size: 1.35rem; } h3 { font-size: 1.15rem; }
+a { color: var(--gold); text-decoration: none; } a:hover { color: var(--gold-light); }
+.container { width: 100%; max-width: 960px; margin: 0 auto; padding: 0 var(--space-md); }
+.page { min-height: 100vh; padding: var(--space-xl) 0; }
+.card { background: var(--bg-card); border: 1px solid #2a2a2a; border-radius: var(--radius-lg); padding: var(--space-lg); }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: var(--space-sm); padding: 10px 20px; border: 1px solid #333; border-radius: var(--radius-md); font-size: 0.95rem; font-weight: 500; cursor: pointer; transition: background 0.15s, border-color 0.15s, color 0.15s; background: var(--bg-elevated); color: var(--text-primary); }
+.btn:hover { background: var(--bg-hover); border-color: #444; }
+.btn-gold { background: transparent; border-color: var(--gold); color: var(--gold); }
+.btn-gold:hover { background: var(--gold); color: #111; }
+.btn-red { border-color: var(--red); color: var(--red); }
+.btn-red:hover { background: var(--red); color: #fff; }
+.btn-blue { border-color: var(--blue); color: var(--blue); }
+.btn-blue:hover { background: var(--blue); color: #fff; }
+.accent-gold { color: var(--gold); } .accent-red { color: var(--red); } .accent-blue { color: var(--blue); }
+.board-wrapper { display: flex; flex-direction: column; align-items: center; gap: var(--space-md); }
+.board { display: grid; grid-template-columns: repeat(8, 1fr); grid-template-rows: repeat(8, 1fr); width: min(90vw, 480px); aspect-ratio: 1 / 1; border: 2px solid var(--board-border); border-radius: var(--radius-sm); overflow: hidden; user-select: none; box-shadow: 0 8px 32px rgba(0,0,0,0.5); }
+.square { display: flex; align-items: center; justify-content: center; font-size: clamp(1.8rem, 7vw, 3rem); cursor: pointer; position: relative; }
+.square.light { background-color: #2a2a2a; } .square.dark { background-color: #1a1a1a; }
+.square.highlight { background-color: var(--highlight) !important; }
+.square.possible::after { content: ""; position: absolute; width: 28%; height: 28%; background: rgba(201, 162, 39, 0.45); border-radius: 50%; pointer-events: none; }
+.square.possible.has-piece::after { width: 85%; height: 85%; background: transparent; border: 3px solid rgba(201, 162, 39, 0.55); border-radius: 50%; }
+.square.selected { background-color: rgba(201, 162, 39, 0.35) !important; }
+.piece-w { color: #f5f5f5; text-shadow: 0 1px 2px rgba(0,0,0,0.8); }
+.piece-b { color: #222; text-shadow: 0 0 1px #fff, 0 0 2px #aaa; }
+.coord { position: absolute; font-size: 0.65rem; color: var(--text-muted); pointer-events: none; }
+.coord-file { bottom: 2px; right: 4px; } .coord-rank { top: 2px; left: 4px; }
+.board-controls { display: flex; gap: var(--space-sm); flex-wrap: wrap; justify-content: center; }
+.status-bar { text-align: center; color: var(--text-secondary); font-size: 0.95rem; min-height: 1.5em; }
+.character-portrait { width: 120px; height: 160px; background: var(--bg-elevated); border: 1px solid #333; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 0.85rem; overflow: hidden; }
+.character-portrait img { width: 100%; height: 100%; object-fit: cover; }
+.text-center { text-align: center; } .hidden { display: none !important; }
+@media (max-width: 480px) { .board { width: min(96vw, 420px); } .btn { padding: 12px 18px; } h1 { font-size: 1.5rem; } }
