@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0a0a0c" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="images/icon.svg" />
+  <title>対局 | 三大将チェス</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    .page-header { margin-bottom: var(--space-xl); text-align: center; }
+    .page-header h1 { font-size: 1.5rem; font-weight: 500; }
+    .page-header p { color: var(--text-secondary); font-size: 0.95rem; }
+    .opponent-select { display: flex; justify-content: center; gap: var(--space-lg); flex-wrap: wrap; }
+    .opponent-card { width: 160px; text-align: center; padding: var(--space-md); background: var(--bg-card); border: 1px solid #2a2a2a; border-radius: var(--radius-lg); text-decoration: none; color: inherit; display: block; }
+    .opponent-card .character-portrait { width: 120px; height: 150px; margin: 0 auto var(--space-sm); }
+    .opponent-card.sakazuki .character-portrait { border-color: var(--red); }
+    .opponent-card.kuzan .character-portrait { border-color: var(--blue); }
+    .opponent-card.borsalino .character-portrait { border-color: var(--gold); }
+    .opponent-name { font-weight: 500; }
+    .opponent-desc { font-size: 0.8rem; color: var(--text-muted); }
+    .back-link { display: inline-block; margin-bottom: var(--space-lg); font-size: 0.9rem; color: var(--text-secondary); }
+  </style>
+</head>
+<body>
+  <div class="page"><div class="container">
+    <a href="index.html" class="back-link">← ホームに戻る</a>
+    <header class="page-header"><h1>対局相手を選ぶ</h1><p>強さ・手番・相手を選んでください</p></header>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:20px;">
+      <button type="button" class="btn diff-btn" data-skill="4">初心者</button>
+      <button type="button" class="btn diff-btn" data-skill="8">中級者</button>
+      <button type="button" class="btn diff-btn btn-gold" data-skill="12">上級者</button>
+      <button type="button" class="btn diff-btn" data-skill="16">プロ</button>
+      <button type="button" class="btn diff-btn" data-skill="19">トッププロ</button>
+    </div>
+    <p id="diff-label" style="text-align:center;color:var(--text-muted);font-size:0.85rem;margin-bottom:16px;">強さ：上級者</p>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:8px;">
+      <button type="button" class="btn color-btn btn-gold" data-color="random">ランダム</button>
+      <button type="button" class="btn color-btn" data-color="white">白（先手）</button>
+      <button type="button" class="btn color-btn" data-color="black">黒（後手）</button>
+    </div>
+    <p id="color-label" style="text-align:center;color:var(--text-muted);font-size:0.85rem;margin-bottom:24px;">手番：ランダム</p>
+    <div class="opponent-select">
+      <a href="#" data-vs="sakazuki" class="opponent-card sakazuki"><div class="character-portrait" data-character="sakazuki"><span>サカズキ</span></div><div class="opponent-name accent-red">サカズキ</div><div class="opponent-desc">基礎・詰み担当</div></a>
+      <a href="#" data-vs="kuzan" class="opponent-card kuzan"><div class="character-portrait" data-character="kuzan"><span>クザン</span></div><div class="opponent-name accent-blue">クザン</div><div class="opponent-desc">戦術・中盤担当</div></a>
+      <a href="#" data-vs="borsalino" class="opponent-card borsalino"><div class="character-portrait" data-character="borsalino"><span>ボルサリーノ</span></div><div class="opponent-name accent-gold">ボルサリーノ</div><div class="opponent-desc">総合・実戦担当</div></a>
+    </div>
+  </div></div>
+  <script>
+    let selectedSkill = 12, selectedColor = "random";
+    const names = {4:"初心者",8:"中級者",12:"上級者",16:"プロ",19:"トッププロ"};
+    const colorNames = {random:"ランダム",white:"白（先手）",black:"黒（後手）"};
+    document.querySelectorAll(".diff-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".diff-btn").forEach(b => b.classList.remove("btn-gold"));
+        btn.classList.add("btn-gold");
+        selectedSkill = parseInt(btn.dataset.skill, 10);
+        document.getElementById("diff-label").textContent = "強さ：" + names[selectedSkill];
+      });
+    });
+    document.querySelectorAll(".color-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".color-btn").forEach(b => b.classList.remove("btn-gold"));
+        btn.classList.add("btn-gold");
+        selectedColor = btn.dataset.color;
+        document.getElementById("color-label").textContent = "手番：" + colorNames[selectedColor];
+      });
+    });
+    document.querySelectorAll(".opponent-card").forEach(card => {
+      card.addEventListener("click", (e) => {
+        e.preventDefault();
+        location.href = "game.html?vs=" + card.dataset.vs + "&skill=" + selectedSkill + "&color=" + selectedColor;
+      });
+    });
+  </script>
+</body>
+</html>
