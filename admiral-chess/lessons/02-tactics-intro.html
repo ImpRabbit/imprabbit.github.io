@@ -1,10 +1,146 @@
 <!DOCTYPE html>
-<html lang="ja"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><meta name="theme-color" content="#0a0a0c"/><link rel="manifest" href="../manifest.webmanifest"/><link rel="apple-touch-icon" href="../images/icon.svg"/><title>戦術入門 | 三大将チェス</title><link rel="stylesheet" href="../css/style.css"/><style>.lesson-layout{display:flex;flex-direction:column;align-items:center;gap:var(--space-lg);max-width:640px;margin:0 auto}.teacher-bar{display:flex;align-items:center;gap:var(--space-md);width:100%;background:var(--bg-card);border:1px solid #2a2a2a;border-radius:var(--radius-md);padding:var(--space-sm) var(--space-md)}.teacher-bar .character-portrait{width:52px;height:68px;font-size:.7rem;border-color:var(--blue)}.teacher-name{font-weight:500;color:var(--blue)}.dialogue-box{width:100%;background:var(--bg-card);border:1px solid #2a2a2a;border-radius:var(--radius-md);padding:var(--space-md) var(--space-lg);min-height:4.5em;line-height:1.6}.dialogue-box.correct{border-color:var(--gold)}.dialogue-box.wrong{border-color:var(--red)}.step-indicator{font-size:.85rem;color:var(--text-muted);text-align:center}.lesson-controls{display:flex;gap:var(--space-sm);justify-content:center;flex-wrap:wrap}.back-link{align-self:flex-start;margin-bottom:var(--space-md);font-size:.9rem;color:var(--text-secondary)}.hint{font-size:.85rem;color:var(--text-muted);text-align:center}</style></head><body><div class="page"><div class="container"><a href="../lessons.html" class="back-link">← レッスン一覧に戻る</a><div class="lesson-layout"><div class="teacher-bar"><div class="character-portrait" data-character="kuzan"><span>クザ</span></div><div><div class="teacher-name">クザン</div><div style="font-size:.8rem;color:var(--text-muted)">初級 ― 戦術入門</div></div></div><div class="dialogue-box" id="dialogue">...</div><div class="step-indicator" id="step-indicator">1/1</div><div class="hint" id="hint"></div><div class="board-wrapper"><div id="board"></div></div><div class="lesson-controls"><button class="btn" id="btn-prev">前へ</button><button class="btn btn-gold" id="btn-next">次へ</button></div></div></div></div><script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script><script src="../js/chess-board.js"></script><script src="../js/progress.js"></script><script src="../js/lesson-extras.js"></script><script>
-const lessonData={id:"02-tactics",steps:[{type:"explain",fen:"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",text:"戦術の話だな。戦術ってのは『相手のミスや形の弱さを突いて得をする手』のことだ。"},{type:"explain",fen:"8/8/8/3q1k2/2N5/8/8/K7 w - - 0 1",highlight:["c4","d5","f5"],text:"フォークは、1つの駒で相手の2つ以上を同時に狙う手だ。"},{type:"practice",fen:"8/8/8/3q1k2/2N5/8/8/K7 w - - 0 1",highlight:["c4"],text:"【問題】ナイトを動かしてキングとクイーンを同時に狙えるマスへ。",correct:["c4e3"],correctText:"正解だ。e3から両方を狙える。",wrongText:"ナイトをe3へ。"},{type:"explain",fen:"4k3/8/8/8/8/8/8/R3K3 w Q - 0 1",highlight:["a1","e8"],text:"ピンは『動かすと大事な駒が取られる』状態に纛ることだ。"},{type:"explain",fen:"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",text:"戦術の感覚は対局で磨かれる。"}]};
-const dialogueEl=document.getElementById("dialogue");const stepEl=document.getElementById("step-indicator");const hintEl=document.getElementById("hint");const btnPrev=document.getElementById("btn-prev");const btnNext=document.getElementById("btn-next");let currentStep=0,practiceSolved=false;const board=window.__lessonBoard=new ChessBoardUI("board",{onMove:onBoardMove});
-function loadStep(index){currentStep=index;practiceSolved=false;const step=lessonData.steps[index];board.loadFen(step.fen);board.clearHighlights();if(step.highlight)step.highlight.forEach(sq=>{const el=board.container.querySelector(`[data-square="${sq}"]`);if(el)el.classList.add("highlight");});dialogueEl.textContent=step.text;dialogueEl.classList.remove("correct","wrong");stepEl.textContent=(index+1)+" / "+lessonData.steps.length;if(step.type==="practice"){hintEl.textContent="駒を動かして正解を探してください";btnNext.disabled=true;btnNext.textContent="正解を出してから次へ";}else{hintEl.textContent="";btnNext.disabled=false;btnNext.textContent=index>=lessonData.steps.length-1?"完了":"次へ";}btnPrev.disabled=index<=0;}
-function onBoardMove(move){const step=lessonData.steps[currentStep];if(step.type!=="practice"||practiceSolved)return;const uci=move.from+move.to+(move.promotion||"");if((step.correct||[]).includes(uci)||(step.correct||[]).includes(move.from+move.to)){practiceSolved=true;dialogueEl.textContent=step.correctText||"正解だ。";dialogueEl.classList.add("correct");hintEl.textContent="正解！";btnNext.disabled=false;btnNext.textContent=currentStep>=lessonData.steps.length-1?"完了":"次へ";}else{dialogueEl.textContent=step.wrongText||"違うぞ。";dialogueEl.classList.add("wrong");setTimeout(()=>board.undo(),600);}}
-btnPrev.addEventListener("click",()=>{if(currentStep>0){loadStep(currentStep-1);Progress.setLessonStep("02-tactics",currentStep);}});
-btnNext.addEventListener("click",()=>{if(currentStep>=lessonData.steps.length-1){Progress.completeLesson("02-tactics");alert("「戦術入門」を終えました。");location.href="../lessons.html";return;}loadStep(currentStep+1);Progress.setLessonStep("02-tactics",currentStep);});
-loadStep(0);
-</script></body></html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0a0a0c" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <link rel="manifest" href="../manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="../images/icon.svg" />
+  <title>戦術入門 | 三大将チェス</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <style>
+    .lesson-layout{display:flex;flex-direction:column;align-items:center;gap:var(--space-lg);max-width:640px;margin:0 auto}
+    .teacher-bar{display:flex;align-items:center;gap:var(--space-md);width:100%;background:var(--bg-card);border:1px solid #2a2a2a;border-radius:var(--radius-md);padding:var(--space-sm) var(--space-md)}
+    .teacher-bar .character-portrait{width:52px;height:68px;font-size:0.7rem;border-color:var(--blue)}
+    .teacher-name{font-weight:500;color:var(--blue)}
+    .dialogue-box{width:100%;background:var(--bg-card);border:1px solid #2a2a2a;border-radius:var(--radius-md);padding:var(--space-md) var(--space-lg);min-height:4.5em;line-height:1.6}
+    .dialogue-box.correct{border-color:var(--gold)}.dialogue-box.wrong{border-color:var(--red)}
+    .step-indicator{font-size:0.85rem;color:var(--text-muted);text-align:center}
+    .lesson-controls{display:flex;gap:var(--space-sm);justify-content:center;flex-wrap:wrap}
+    .back-link{align-self:flex-start;margin-bottom:var(--space-md);font-size:0.9rem;color:var(--text-secondary)}
+    .hint{font-size:0.85rem;color:var(--text-muted);text-align:center}
+  </style>
+</head>
+<body>
+  <div class="page"><div class="container">
+    <a href="../lessons.html" class="back-link">← レッスン一覧に戻る</a>
+    <div class="lesson-layout">
+      <div class="teacher-bar">
+        <div class="character-portrait" data-character="kuzan"><span>クザ</span></div>
+        <div><div class="teacher-name">クザン</div><div style="font-size:0.8rem;color:var(--text-muted)">戦術担当</div></div>
+      </div>
+      <div class="dialogue-box" id="dialogue">読み込み中…</div>
+      <div class="step-indicator" id="step-indicator">1 / 1</div>
+      <div class="hint" id="hint"></div>
+      <div class="board-wrapper"><div id="board"></div></div>
+      <div class="lesson-controls">
+        <button class="btn" id="btn-prev">前へ</button>
+        <button class="btn btn-gold" id="btn-next">次へ</button>
+      </div>
+    </div>
+  </div></div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+  <script src="../js/chess-board.js"></script>
+  <script src="../js/lesson-extras.js"></script>
+  <script src="../js/progress.js"></script>
+  <script>
+const lessonData = {
+      id: "02-tactics",
+      title: "戦術入門",
+      teacher: "kuzan",
+      steps: [
+        { type:"explain", fen:"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+          text:"あらら…戦術の話だな。戦術ってのは『相手のミスや形の弱さを突いて得をする手』のことだ。まずは一番わかりやすいフォークから行こう。" },
+        { type:"explain", fen:"8/8/8/3q4/8/8/3N4/3K4 w - - 0 1", highlight:["d2","d5","b3","c4","e4","f3"],
+          text:"フォークは、1つの駒で相手の2つ以上を同時に狙う手だ。ナイトのフォークが特に有名で、キングとクイーンを同時に狙えると相手はどちらかを諦めることになる。" },
+        { type:"explain", fen:"8/8/8/3q1k2/2N5/8/8/K7 w - - 0 1", highlight:["c4","d5","f5","e3","e5","b6","a5","a3","b2","d2","e3"],
+          text:"この図のナイト（c4）を見ろ。e3に跳ぶと、キング（f5）とクイーン（d5）の両方に利く。これがフォークの典型だ。" },
+        { type:"explain", fen:"8/8/8/3q1k2/2N5/8/8/K7 w - - 0 1",
+          text:"相手が両方を守れないとき、得をする。駒の価値で言えば、クイーンを取れる方が大きい。でもキングへのチェックを優先することもある。" },
+        { type:"practice", fen:"8/8/8/3q1k2/2N5/8/8/K7 w - - 0 1", highlight:["c4"],
+          text:"【問題1】このナイト（c4）を動かして、キングとクイーンを同時に狙えるマスに置け。",
+          correct:["c4e3"],
+          correctText:"正解だ。e3からキングとクイーンの両方を狙える。",
+          wrongText:"ナイトをe3へ。両方を同時に狙えるマスだ。" },
+        { type:"practice", fen:"8/8/8/3q1k2/2N5/8/8/K7 w - - 0 1", highlight:["c4"],
+          text:"【問題2】このナイトで、相手キングにチェックをかけつつ、別の得も狙えるマスを探せ（フォークの感覚）。",
+          correct:["c4e3","c4d6","c4e5"],
+          correctText:"いい感覚だ。チェックと同時に他の駒も狙うのがフォークの強さだ。",
+          wrongText:"e3など、キングに利くマスを探せ。" },
+        { type:"explain", fen:"4k3/8/8/8/8/8/8/R3K3 w Q - 0 1", highlight:["a1","e8"],
+          text:"次はピンだ。ピンは『動かすと大事な駒（キングやクイーン）が取られる』状態に縛ることだ。動けない駒は実質死んでいる。" },
+        { type:"explain", fen:"4k3/8/8/8/8/8/8/R3K3 w Q - 0 1",
+          text:"ライン上に敵の駒があり、その奥にキングや重い駒があるとき、手前の駒は動けない。ルークやビショップ、クイーンがピンを作りやすい。" },
+        { type:"practice", fen:"7k/8/6K1/8/8/8/8/7R w - - 0 1", highlight:["h1"],
+          text:"【問題3】このルークを、相手キングと同じファイル（縦の列）に置いてチェックをかけろ。",
+          correct:["h1h8","h1h7","h1h6","h1h5","h1h4","h1h3","h1h2"],
+          correctText:"正解だ。同じ縦筋でチェックになる。",
+          wrongText:"ルークをh列に動かせ。" },
+        { type:"explain", fen:"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+          text:"戦術の感覚は対局で磨かれる。『相手の2つの駒が同じ線や跳べる位置にあるか』を見る癖をつけろ。次のレッスンで詰みもやるぞ。" }
+      ]
+    };
+    const dialogueEl = document.getElementById("dialogue");
+    const stepEl = document.getElementById("step-indicator");
+    const hintEl = document.getElementById("hint");
+    const btnPrev = document.getElementById("btn-prev");
+    const btnNext = document.getElementById("btn-next");
+    let currentStep = 0, practiceSolved = false;
+    const board = window.__lessonBoard = new ChessBoardUI("board", { onMove: onBoardMove });
+    function loadStep(index) {
+      currentStep = index; practiceSolved = false;
+      const step = lessonData.steps[index];
+      board.loadFen(step.fen); board.clearHighlights();
+      if (step.highlight) step.highlight.forEach(sq => {
+        const el = board.container.querySelector(`[data-square="${sq}"]`);
+        if (el) el.classList.add("highlight");
+      });
+      dialogueEl.textContent = step.text;
+      dialogueEl.classList.remove("correct", "wrong");
+      stepEl.textContent = (index + 1) + " / " + lessonData.steps.length;
+      if (step.type === "practice") {
+        hintEl.textContent = "駒を動かして正解を探してください";
+        btnNext.disabled = true; btnNext.textContent = "正解を出してから次へ";
+      } else {
+        hintEl.textContent = "";
+        btnNext.disabled = false;
+        btnNext.textContent = index >= lessonData.steps.length - 1 ? "完了" : "次へ";
+      }
+      btnPrev.disabled = index <= 0;
+    }
+    function onBoardMove(move) {
+      const step = lessonData.steps[currentStep];
+      if (step.type !== "practice" || practiceSolved) return;
+      const uci = move.from + move.to + (move.promotion || "");
+      if ((step.correct || []).includes(uci) || (step.correct || []).includes(move.from + move.to)) {
+        practiceSolved = true;
+        dialogueEl.textContent = step.correctText || "正解だ。";
+        dialogueEl.classList.add("correct");
+        hintEl.textContent = "正解！次へ進めます";
+        btnNext.disabled = false;
+        btnNext.textContent = currentStep >= lessonData.steps.length - 1 ? "完了" : "次へ";
+      } else {
+        dialogueEl.textContent = step.wrongText || "違うぞ。もう一度考えてみろ。";
+        dialogueEl.classList.add("wrong");
+        hintEl.textContent = "別の手を試してみてください";
+        setTimeout(() => board.undo(), 600);
+      }
+    }
+    btnPrev.addEventListener("click", () => {
+      if (currentStep > 0) { loadStep(currentStep - 1); Progress.setLessonStep("02-tactics", currentStep); }
+    });
+    btnNext.addEventListener("click", () => {
+      if (currentStep >= lessonData.steps.length - 1) {
+        Progress.completeLesson("02-tactics");
+        alert("「戦術入門」を終えました。");
+        location.href = "../lessons.html";
+        return;
+      }
+      loadStep(currentStep + 1);
+      Progress.setLessonStep("02-tactics", currentStep);
+    });
+    loadStep(0);
+  </script>
+</body>
+</html>
