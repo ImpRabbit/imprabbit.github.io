@@ -61,8 +61,8 @@ const lessonData = {
       correct:["g1f3"],
       correctText:"正解だ。",
       wrongText:"g1のナイトをf3へ。" },
-    { type:"practice", fen:"rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2", highlight:["b1"],
-      text:"【問題3】もう一方のナイトも出せ（c3へ）。白番として考えて。",
+    { type:"practice", fen:"rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 1 2", highlight:["b1"],
+      text:"【問題3】もう一方のナイトも出せ（c3へ）。",
       correct:["b1c3"],
       correctText:"正解だ。両ナイトが出れば展開は順調だ。",
       wrongText:"b1のナイトをc3へ。" },
@@ -77,8 +77,8 @@ const lessonData = {
 const dialogueEl=document.getElementById("dialogue"),stepEl=document.getElementById("step-indicator"),hintEl=document.getElementById("hint"),btnPrev=document.getElementById("btn-prev"),btnNext=document.getElementById("btn-next");
 let currentStep=0,practiceSolved=false;
 const board=window.__lessonBoard=new ChessBoardUI("board",{onMove:onBoardMove});
-function loadStep(i){currentStep=i;practiceSolved=false;const s=lessonData.steps[i];board.loadFen(s.fen);board.clearHighlights();if(s.highlight)s.highlight.forEach(sq=>{const el=board.container.querySelector(`[data-square="${sq}"]`);if(el)el.classList.add("highlight");});dialogueEl.textContent=s.text;dialogueEl.classList.remove("correct","wrong");stepEl.textContent=(i+1)+" / "+lessonData.steps.length;if(s.type==="practice"){hintEl.textContent="駒を動かして正解を";btnNext.disabled=true;btnNext.textContent="正解後に次へ";}else{hintEl.textContent="";btnNext.disabled=false;btnNext.textContent=i>=lessonData.steps.length-1?"完了":"次へ";}btnPrev.disabled=i<=0;}
-function onBoardMove(move){const s=lessonData.steps[currentStep];if(s.type!=="practice"||practiceSolved)return;const uci=move.from+move.to+(move.promotion||"");if((s.correct||[]).includes(uci)||(s.correct||[]).includes(move.from+move.to)){practiceSolved=true;dialogueEl.textContent=s.correctText||"正解だ。";dialogueEl.classList.add("correct");btnNext.disabled=false;btnNext.textContent=currentStep>=lessonData.steps.length-1?"完了":"次へ";}else{dialogueEl.textContent=s.wrongText||"違うぞ。";dialogueEl.classList.add("wrong");setTimeout(()=>board.undo(),600);}}
+function loadStep(i){currentStep=i;practiceSolved=false;const s=lessonData.steps[i];board.loadFen(s.fen);board.clearHighlights();if(s.highlight)s.highlight.forEach(sq=>{const el=board.container.querySelector(`[data-square="${sq}"]`);if(el)el.classList.add("highlight");});dialogueEl.textContent=s.text;dialogueEl.classList.remove("correct","wrong");stepEl.textContent=(i+1)+" / "+lessonData.steps.length;if(s.type==="practice"){hintEl.textContent="駒を動かして正解を探してください";btnNext.disabled=true;btnNext.textContent="正解を出してから次へ";}else{hintEl.textContent="";btnNext.disabled=false;btnNext.textContent=i>=lessonData.steps.length-1?"完了":"次へ";}btnPrev.disabled=i<=0;}
+function onBoardMove(move){const s=lessonData.steps[currentStep];if(s.type!=="practice"||practiceSolved)return;const uci=move.from+move.to+(move.promotion||"");if((s.correct||[]).includes(uci)||(s.correct||[]).includes(move.from+move.to)){practiceSolved=true;dialogueEl.textContent=s.correctText||"正解だ。";dialogueEl.classList.add("correct");hintEl.textContent="正解！次へ進めます";btnNext.disabled=false;btnNext.textContent=currentStep>=lessonData.steps.length-1?"完了":"次へ";}else{dialogueEl.textContent=s.wrongText||"違うぞ。もう一度考えてみろ。";dialogueEl.classList.add("wrong");hintEl.textContent="別の手を試してみてください";setTimeout(()=>board.undo(),600);}}
 btnPrev.onclick=()=>{if(currentStep>0){loadStep(currentStep-1);Progress.setLessonStep("07-mistakes",currentStep);}};
 btnNext.onclick=()=>{if(currentStep>=lessonData.steps.length-1){Progress.completeLesson("07-mistakes");alert("「典型的な初心者の失敗」を終えました。");location.href="../lessons.html";return;}loadStep(currentStep+1);Progress.setLessonStep("07-mistakes",currentStep);};
 loadStep(0);
